@@ -1,0 +1,542 @@
+/* =========================================
+   BASE
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background: #f5f7f9;
+  color: #1f2933;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e4e7eb;
+  padding: 22px 40px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #17202a;
+}
+
+.header p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: #7b8794;
+}
+
+.header nav {
+  display: flex;
+  gap: 10px;
+}
+
+.header nav button {
+  border: 1px solid #d7dce1;
+  background: #ffffff;
+  color: #344050;
+
+  padding: 10px 17px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+.header nav button:hover {
+  background: #f0f3f5;
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+main {
+  width: min(1100px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 45px 0 80px;
+}
+
+
+/* =========================================
+   PANTALLA INICIAL DEL ASISTENTE
+========================================= */
+
+.inicio-asistente {
+  width: min(620px, 100%);
+  margin: 20px auto 50px;
+  padding: 45px 40px;
+
+  background: #ffffff;
+  border: 1px solid #e3e7eb;
+  border-radius: 16px;
+
+  text-align: center;
+}
+
+
+/* ESTE ES EL LOGO DE LA PANTALLA PRINCIPAL */
+
+.logo-asistente {
+  display: block;
+
+  width: 130px !important;
+  max-width: 130px !important;
+  height: auto !important;
+
+  object-fit: contain;
+
+  margin: 0 auto 25px;
+}
+
+.inicio-asistente h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  color: #1d2733;
+}
+
+.inicio-asistente p {
+  max-width: 450px;
+  margin: 0 auto 30px;
+
+  font-size: 15px;
+  line-height: 1.7;
+  color: #687481;
+}
+
+.btn-comenzar {
+  border: none;
+  border-radius: 9px;
+
+  padding: 14px 26px;
+
+  background: #263746;
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+.btn-comenzar:hover {
+  background: #182630;
+}
+
+
+/* =========================================
+   SWEET ALERT - ASISTENTE
+========================================= */
+
+.swal2-popup {
+  border-radius: 16px !important;
+  padding: 28px !important;
+}
+
+.swal2-title {
+  color: #202b36 !important;
+  font-size: 24px !important;
+}
+
+.swal-form {
+  text-align: left;
+}
+
+.swal-paso {
+  margin: 0 0 22px;
+
+  text-align: center;
+
+  color: #89939d;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.swal-form label {
+  display: block;
+  margin-bottom: 18px;
+
+  color: #374350;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.swal-form .swal2-input,
+.swal-form .swal2-textarea,
+.swal-form .swal2-select {
+  display: block;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 7px 0 0 !important;
+
+  border: 1px solid #ccd3d9 !important;
+  border-radius: 8px !important;
+
+  box-shadow: none !important;
+
+  font-size: 15px !important;
+}
+
+.swal-form .swal2-input {
+  height: 45px;
+  padding: 0 12px;
+}
+
+.swal-form .swal2-textarea {
+  min-height: 90px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.swal-form .swal2-select {
+  height: 45px;
+  padding: 0 10px;
+}
+
+.swal2-confirm {
+  background: #263746 !important;
+  border-radius: 8px !important;
+}
+
+.swal2-cancel {
+  border-radius: 8px !important;
+}
+
+
+/* =========================================
+   FORMULARIO ANTIGUO
+   Lo dejamos preparado aunque ahora no se use
+========================================= */
+
+.formulario {
+  background: #ffffff;
+  padding: 35px;
+  border: 1px solid #e1e5e8;
+  border-radius: 14px;
+}
+
+.formulario section {
+  margin-bottom: 35px;
+}
+
+.formulario label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  margin-bottom: 17px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.formulario input,
+.formulario select,
+.formulario textarea {
+  width: 100%;
+  padding: 11px;
+
+  border: 1px solid #cdd3d8;
+  border-radius: 7px;
+
+  font-size: 15px;
+}
+
+.formulario textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.encabezado-formulario {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+
+/* LOGO DEL FORMULARIO */
+
+.logo-planilla {
+  display: block;
+
+  width: 130px !important;
+  max-width: 130px !important;
+  height: auto !important;
+
+  object-fit: contain;
+
+  margin: 0 auto 15px;
+}
+
+
+/* =========================================
+   VISTA PREVIA
+========================================= */
+
+.zona-preview {
+  margin-top: 65px;
+}
+
+.zona-preview > h2 {
+  width: min(794px, 100%);
+  margin: 0 auto 20px;
+
+  font-size: 20px;
+  color: #25313c;
+}
+
+
+/* =========================================
+   HOJA A4
+========================================= */
+
+.hoja-planilla {
+  width: min(794px, 100%);
+  min-height: 1123px;
+
+  margin: 0 auto 45px;
+  padding: 45px 50px;
+
+  background: #ffffff;
+  color: #111;
+
+  border: 1px solid #d5d8dc;
+}
+
+
+/* =========================================
+   CABECERA DE LA PLANILLA
+========================================= */
+
+.cabecera-documento {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+
+/* LOGO DENTRO DEL DOCUMENTO */
+
+.logo-documento {
+  display: block;
+
+  width: 110px !important;
+  max-width: 110px !important;
+  height: auto !important;
+
+  object-fit: contain;
+
+  margin: 0 auto 8px;
+}
+
+.texto-cabecera {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.texto-cabecera strong {
+  display: block;
+  margin-top: 8px;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   TABLA DE LA PLANILLA
+========================================= */
+
+.titulo-seccion-planilla {
+  margin-top: 9px;
+  padding: 4px 5px;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+
+  border-bottom: 1px solid #555;
+}
+
+.fila-planilla {
+  display: grid;
+  grid-template-columns: 55% 45%;
+}
+
+.celda-planilla {
+  min-height: 20px;
+
+  padding: 3px 5px;
+
+  border-left: 1px solid #777;
+  border-bottom: 1px solid #777;
+
+  display: flex;
+  align-items: center;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8px;
+  line-height: 1.2;
+
+  overflow-wrap: anywhere;
+}
+
+.fila-planilla .celda-planilla:last-child {
+  border-right: 1px solid #777;
+}
+
+.titulo-celda {
+  font-weight: 600;
+}
+
+.valor-celda {
+  font-weight: 400;
+}
+
+
+/* =========================================
+   SEGUNDA HOJA
+========================================= */
+
+.segunda-hoja {
+  min-height: 1123px;
+}
+
+.campo-grande-planilla {
+  min-height: 130px;
+
+  padding: 10px;
+
+  border: 1px solid #777;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.4;
+
+  white-space: pre-wrap;
+}
+
+.campo-grafico-planilla {
+  min-height: 480px;
+
+  margin-top: 5px;
+  padding: 15px;
+
+  border: 1px solid #777;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+
+  white-space: pre-wrap;
+}
+
+
+/* =========================================
+   HISTORIAL
+========================================= */
+
+.historial {
+  width: min(850px, 100%);
+  margin: 0 auto;
+
+  background: #ffffff;
+  border: 1px solid #e2e6e9;
+  border-radius: 14px;
+
+  padding: 35px;
+}
+
+.historial h2 {
+  margin-top: 0;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .header {
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header nav {
+    width: 100%;
+  }
+
+  .header nav button {
+    flex: 1;
+  }
+
+  main {
+    width: min(100% - 24px, 1100px);
+    padding-top: 25px;
+  }
+
+  .inicio-asistente {
+    padding: 35px 22px;
+  }
+
+  .hoja-planilla {
+    padding: 25px 15px;
+  }
+
+  .fila-planilla {
+    grid-template-columns: 52% 48%;
+  }
+
+  .celda-planilla {
+    font-size: 7px;
+  }
+
+  .logo-asistente {
+    width: 110px !important;
+    max-width: 110px !important;
+  }
+
+  .logo-documento {
+    width: 90px !important;
+    max-width: 90px !important;
+  }
+
+}
