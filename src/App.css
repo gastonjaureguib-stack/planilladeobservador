@@ -715,3 +715,363 @@ main {
     flex: 1;
   }
 }
+
+/* =========================================================
+   IMPRESION / GUARDAR COMO PDF
+   2 PAGINAS A4
+   ========================================================= */
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+
+  /* -----------------------------------------
+     DOCUMENTO GENERAL
+     ----------------------------------------- */
+
+  html,
+  body {
+    width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
+
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    min-width: 0 !important;
+  }
+
+  .app {
+    width: 210mm !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
+  }
+
+
+  /* -----------------------------------------
+     OCULTAR TODO LO QUE NO VA EN EL PDF
+     ----------------------------------------- */
+
+  .header,
+  .zona-preview > h2,
+  .acciones-planilla,
+  .acciones-observacion,
+  .modo-edicion,
+  .inicio-asistente,
+  .info-asistente,
+  .historial,
+  .formulario,
+  .no-imprimir {
+    display: none !important;
+  }
+
+
+  /* -----------------------------------------
+     CONTENEDORES
+     ----------------------------------------- */
+
+  main {
+    display: block !important;
+
+    width: 210mm !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .zona-preview {
+    display: block !important;
+
+    width: 210mm !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
+  }
+
+
+  /* -----------------------------------------
+     CADA .hoja-planilla = EXACTAMENTE 1 A4
+     ----------------------------------------- */
+
+  .hoja-planilla {
+    display: block !important;
+
+    box-sizing: border-box !important;
+
+    width: 210mm !important;
+    height: 297mm !important;
+
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+
+    margin: 0 !important;
+
+    /*
+      Dejamos espacio suficiente para imprimir
+      pero comprimimos la planilla para que
+      la primera hoja entre completa.
+    */
+    padding: 8mm 11mm !important;
+
+    background: #ffffff !important;
+
+    border: none !important;
+    box-shadow: none !important;
+
+    overflow: hidden !important;
+
+    page-break-before: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+
+  /* La segunda hoja no genera una tercera */
+  .hoja-planilla:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+
+  /* -----------------------------------------
+     CABECERA
+     ----------------------------------------- */
+
+  .cabecera-documento {
+    margin: 0 0 3mm 0 !important;
+    padding: 0 !important;
+
+    text-align: center !important;
+  }
+
+  .logo-documento {
+    display: block !important;
+
+    width: 68px !important;
+    max-width: 68px !important;
+    height: auto !important;
+
+    margin: 0 auto 1.5mm !important;
+
+    object-fit: contain !important;
+  }
+
+  .texto-cabecera {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-family: Arial, Helvetica, sans-serif !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+  }
+
+  .texto-cabecera strong {
+    display: block !important;
+
+    margin: 1.5mm 0 0 !important;
+
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+  }
+
+
+  /* -----------------------------------------
+     TITULOS DE SECCION
+     ----------------------------------------- */
+
+  .titulo-seccion-planilla {
+    box-sizing: border-box !important;
+
+    margin: 1.8mm 0 0 !important;
+    padding: 0.8mm 1mm !important;
+
+    font-family: Arial, Helvetica, sans-serif !important;
+
+    font-size: 7px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+
+    border-bottom: 0.25mm solid #555 !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+
+  /* -----------------------------------------
+     FILAS
+     ----------------------------------------- */
+
+  .fila-planilla {
+    display: grid !important;
+
+    grid-template-columns: 55% 45% !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+
+  /* -----------------------------------------
+     CELDAS
+     ----------------------------------------- */
+
+  .celda-planilla {
+    box-sizing: border-box !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    margin: 0 !important;
+
+    padding: 0.65mm 1mm !important;
+
+    border-left: 0.25mm solid #777 !important;
+    border-bottom: 0.25mm solid #777 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    font-family: Arial, Helvetica, sans-serif !important;
+
+    font-size: 6.3px !important;
+    line-height: 1.05 !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .fila-planilla .celda-planilla:last-child {
+    border-right: 0.25mm solid #777 !important;
+  }
+
+  .titulo-celda {
+    font-weight: 600 !important;
+  }
+
+  .valor-celda {
+    font-weight: 400 !important;
+  }
+
+
+  /* -----------------------------------------
+     SEGUNDA HOJA
+     ----------------------------------------- */
+
+  .segunda-hoja {
+    width: 210mm !important;
+    height: 297mm !important;
+
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+
+    margin: 0 !important;
+
+    padding: 8mm 11mm !important;
+
+    page-break-before: auto !important;
+    break-before: auto !important;
+
+    page-break-after: auto !important;
+    break-after: auto !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /* -----------------------------------------
+     OTROS DATOS
+     ----------------------------------------- */
+
+  .campo-grande-planilla {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+
+    min-height: 55mm !important;
+    height: 55mm !important;
+    max-height: 55mm !important;
+
+    margin: 0 !important;
+    padding: 2mm !important;
+
+    border: 0.25mm solid #777 !important;
+
+    font-family: Arial, Helvetica, sans-serif !important;
+
+    font-size: 7px !important;
+    line-height: 1.15 !important;
+
+    white-space: pre-wrap !important;
+
+    overflow: hidden !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+
+  /* -----------------------------------------
+     PLANIFICACION GRAFICA
+     ----------------------------------------- */
+
+  .campo-grafico-planilla {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+
+    min-height: 115mm !important;
+    height: 115mm !important;
+    max-height: 115mm !important;
+
+    margin: 1mm 0 0 !important;
+    padding: 2mm !important;
+
+    border: 0.25mm solid #777 !important;
+
+    font-family: Arial, Helvetica, sans-serif !important;
+
+    font-size: 7px !important;
+    line-height: 1.15 !important;
+
+    white-space: pre-wrap !important;
+
+    overflow: hidden !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

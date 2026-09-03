@@ -86,7 +86,7 @@ function FormularioObservacion({ formData, setFormData }) {
         </label>
 
         <label>
-          Firma y aclaración del profesor
+          Firma y aclaración de presencia por el técnico del club observado
 
           <input
             type="text"
