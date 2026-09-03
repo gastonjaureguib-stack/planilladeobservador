@@ -1,5 +1,10 @@
-function PlanillaPreview({ formData }) {
+import Swal from "sweetalert2";
 
+function PlanillaPreview({
+  formData,
+  setFormData,
+  editable = false,
+}) {
   const mostrar = (valor) => {
     return valor || "";
   };
@@ -12,17 +17,195 @@ function PlanillaPreview({ formData }) {
     return `${dia}/${mes}/${anio}`;
   };
 
-  const Fila = ({ titulo, valor }) => (
-    <div className="fila-planilla">
-      <div className="celda-planilla titulo-celda">
-        {titulo}
-      </div>
 
-      <div className="celda-planilla valor-celda">
-        {mostrar(valor)}
+  // =====================================================
+  // EDITAR CAMPO CON SWEETALERT
+  // =====================================================
+
+  const editarCampo = async ({
+    campo,
+    titulo,
+    tipo = "text",
+    opciones = null,
+  }) => {
+    if (!editable || !setFormData) return;
+
+
+    let resultado;
+
+
+    // SELECT: Sí / No
+    if (tipo === "select") {
+      resultado = await Swal.fire({
+        title: titulo,
+
+        input: "select",
+
+        inputOptions: opciones,
+
+        inputValue:
+          formData[campo] || "",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Aceptar",
+
+        cancelButtonText: "Cancelar",
+      });
+    }
+
+
+    // TEXTAREA
+    else if (tipo === "textarea") {
+      resultado = await Swal.fire({
+        title: titulo,
+
+        input: "textarea",
+
+        inputValue:
+          formData[campo] || "",
+
+        inputAttributes: {
+          rows: "6",
+        },
+
+        showCancelButton: true,
+
+        confirmButtonText: "Aceptar",
+
+        cancelButtonText: "Cancelar",
+      });
+    }
+
+
+    // FECHA
+    else if (tipo === "date") {
+      resultado = await Swal.fire({
+        title: titulo,
+
+        input: "date",
+
+        inputValue:
+          formData[campo] || "",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Aceptar",
+
+        cancelButtonText: "Cancelar",
+      });
+    }
+
+
+    // NÚMERO
+    else if (tipo === "number") {
+      resultado = await Swal.fire({
+        title: titulo,
+
+        input: "number",
+
+        inputValue:
+          formData[campo] || "",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Aceptar",
+
+        cancelButtonText: "Cancelar",
+      });
+    }
+
+
+    // TEXTO NORMAL
+    else {
+      resultado = await Swal.fire({
+        title: titulo,
+
+        input: "text",
+
+        inputValue:
+          formData[campo] || "",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Aceptar",
+
+        cancelButtonText: "Cancelar",
+      });
+    }
+
+
+    if (!resultado.isConfirmed) {
+      return;
+    }
+
+
+    setFormData((prev) => ({
+      ...prev,
+      [campo]: resultado.value,
+    }));
+  };
+
+
+  // =====================================================
+  // FILA
+  // =====================================================
+
+  const Fila = ({
+    titulo,
+    campo,
+    tipo = "text",
+    opciones = null,
+    formato,
+  }) => {
+    const valor = formData[campo];
+
+    const valorVisible = formato
+      ? formato(valor)
+      : mostrar(valor);
+
+
+    return (
+      <div className="fila-planilla">
+
+        <div className="celda-planilla titulo-celda">
+          {titulo}
+        </div>
+
+
+        <div
+          className={
+            editable
+              ? "celda-planilla valor-celda campo-editable"
+              : "celda-planilla valor-celda"
+          }
+
+          onClick={() =>
+            editarCampo({
+              campo,
+              titulo,
+              tipo,
+              opciones,
+            })
+          }
+
+          title={
+            editable
+              ? "Hacé clic para editar"
+              : undefined
+          }
+        >
+          {valorVisible || (
+            editable
+              ? <span className="campo-vacio">Editar...</span>
+              : ""
+          )}
+        </div>
+
       </div>
-    </div>
-  );
+    );
+  };
+
 
   const TituloSeccion = ({ children }) => (
     <div className="titulo-seccion-planilla">
@@ -30,12 +213,36 @@ function PlanillaPreview({ formData }) {
     </div>
   );
 
+
+  const opcionesSiNo = {
+    "": "Sin seleccionar",
+    "Sí": "Sí",
+    "No": "No",
+  };
+
+
   return (
     <div className="zona-preview">
 
-      <h2>Vista previa de la planilla</h2>
+      <h2>
+        {editable
+          ? "Editá la planilla"
+          : "Vista previa de la planilla"}
+      </h2>
 
-      {/* HOJA 1 */}
+
+      {editable && (
+        <p className="ayuda-edicion no-imprimir">
+          Hacé clic sobre cualquier dato de la
+          planilla para modificarlo.
+        </p>
+      )}
+
+
+      {/* ========================================= */}
+      {/* HOJA 1                                    */}
+      {/* ========================================= */}
+
       <div className="hoja-planilla">
 
         <div className="cabecera-documento">
@@ -47,229 +254,326 @@ function PlanillaPreview({ formData }) {
           />
 
           <div className="texto-cabecera">
-            <div>VISORÍA DE LICENCIA C</div>
+
+            <div>
+              VISORÍA DE LICENCIA C
+            </div>
 
             <strong>
               ASIGNATURA TÉCNICO - TÁCTICO
             </strong>
+
           </div>
 
         </div>
+
 
         <TituloSeccion>
           1. OBSERVACIÓN DE ENTRENAMIENTO
         </TituloSeccion>
 
+
         <Fila
           titulo="1. NOMBRE DEL ALUMNO OBSERVADOR:"
-          valor={formData.nombreObservador}
+          campo="nombreObservador"
         />
+
 
         <Fila
           titulo="2. FECHA DE OBSERVACIÓN:"
-          valor={fecha(formData.fechaObservacion)}
+          campo="fechaObservacion"
+          tipo="date"
+          formato={fecha}
         />
+
 
         <Fila
           titulo="3. FECHA DE ENTREGA DE LA VISORÍA:"
-          valor={fecha(formData.fechaEntrega)}
+          campo="fechaEntrega"
+          tipo="date"
+          formato={fecha}
         />
+
 
         <Fila
           titulo="4. FIRMA Y ACLARACIÓN DEL PROFESOR:"
-          valor={formData.firmaProfesor}
+          campo="firmaProfesor"
         />
+
 
         <TituloSeccion>
           2. DATOS GENERALES
         </TituloSeccion>
 
+
         <Fila
           titulo="NOMBRE DEL CLUB OBSERVADO:"
-          valor={formData.club}
+          campo="club"
         />
+
 
         <Fila
           titulo="CATEGORÍA / EDADES DE LOS JUGADORES:"
-          valor={formData.categoria}
+          campo="categoria"
         />
+
 
         <Fila
           titulo="NÚMERO DE JUGADORES PRESENTES:"
-          valor={formData.jugadoresPresentes}
+          campo="jugadoresPresentes"
+          tipo="number"
         />
+
 
         <Fila
           titulo="NÚMERO DE PRÁCTICAS SEMANALES:"
-          valor={formData.practicasSemanales}
+          campo="practicasSemanales"
+          tipo="number"
         />
+
 
         <TituloSeccion>
           3. EL TÉCNICO
         </TituloSeccion>
 
+
         <Fila
           titulo="NOMBRE:"
-          valor={formData.tecnicoNombre}
+          campo="tecnicoNombre"
         />
+
 
         <Fila
           titulo="EXPERIENCIA DE JUGADOR:"
-          valor={formData.experienciaJugador}
+          campo="experienciaJugador"
+          tipo="textarea"
         />
+
 
         <Fila
           titulo="CAPACITACIÓN COMO ENTRENADOR:"
-          valor={formData.capacitacionEntrenador}
+          campo="capacitacionEntrenador"
+          tipo="textarea"
         />
+
 
         <Fila
           titulo="¿ENTRENA CON UN EQUIPO DEPORTIVO?"
-          valor={formData.entrenaEquipo}
+          campo="entrenaEquipo"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <TituloSeccion>
           4. LA PRÁCTICA
         </TituloSeccion>
 
+
         <Fila
           titulo="¿EXISTE UNA ESTRUCTURA DE LA SESIÓN?"
-          valor={formData.estructuraSesion}
+          campo="estructuraSesion"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="TOMA DEL GRUPO:"
-          valor={formData.tomaGrupo}
+          campo="tomaGrupo"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="PRESENTACIÓN DEL TRABAJO:"
-          valor={formData.presentacionTrabajo}
+          campo="presentacionTrabajo"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="CALENTAMIENTO:"
-          valor={formData.calentamiento}
+          campo="calentamiento"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="PARTE PRINCIPAL:"
-          valor={formData.partePrincipal}
+          campo="partePrincipal"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="PARTE APRENDIZAJE DEL JUEGO:"
-          valor={formData.aprendizajeJuego}
+          campo="aprendizajeJuego"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="EVALUACIÓN DE LA SESIÓN CON LOS JUGADORES:"
-          valor={formData.evaluacionJugadores}
+          campo="evaluacionJugadores"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="TIEMPO TOTAL DE LA SESIÓN:"
-          valor={
-            formData.tiempoSesion
-              ? `${formData.tiempoSesion} minutos`
+          campo="tiempoSesion"
+          tipo="number"
+          formato={(valor) =>
+            valor
+              ? `${valor} minutos`
               : ""
           }
         />
+
 
         <TituloSeccion>
           5. MATERIAL / INFRAESTRUCTURA
         </TituloSeccion>
 
+
         <Fila
           titulo="ESPACIO DISPONIBLE:"
-          valor={formData.espacioDisponible}
+          campo="espacioDisponible"
         />
+
 
         <Fila
           titulo="MATERIAL DISPONIBLE:"
-          valor={formData.materialDisponible}
+          campo="materialDisponible"
+          tipo="textarea"
         />
+
 
         <Fila
           titulo="ACTITUD PEDAGÓGICA:"
-          valor={formData.actitudPedagogica}
+          campo="actitudPedagogica"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="PRESENTACIÓN:"
-          valor={formData.presentacion}
+          campo="presentacion"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="DEMOSTRACIÓN:"
-          valor={formData.demostracion}
+          campo="demostracion"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="CONSIGNAS CORRECTAS:"
-          valor={formData.consignasCorrectas}
+          campo="consignasCorrectas"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <TituloSeccion>
           6. LA SESIÓN
         </TituloSeccion>
 
+
         <Fila
           titulo="¿EL TÉCNICO PROPONE LOS ALCANCES?"
-          valor={formData.alcancesSesion}
+          campo="alcancesSesion"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <Fila
           titulo="¿EXISTE UNA PLANIFICACIÓN A CORTO O LARGO PLAZO?"
-          valor={formData.planificacionCortoLargoPlazo}
+          campo="planificacionCortoLargoPlazo"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <TituloSeccion>
           7. CLIMA DE APRENDIZAJE
         </TituloSeccion>
 
+
         <Fila
           titulo="COMPORTAMIENTO DEL EDUCADOR:"
-          valor={formData.comportamientoEducador}
+          campo="comportamientoEducador"
+          tipo="textarea"
         />
+
 
         <Fila
           titulo="PARTICIPACIÓN DE LOS NIÑOS:"
-          valor={formData.participacionNinos}
+          campo="participacionNinos"
+          tipo="textarea"
         />
+
 
         <TituloSeccion>
           8. AL FINAL DE LA SESIÓN
         </TituloSeccion>
 
+
         <Fila
           titulo="RECOLECCIÓN DEL MATERIAL POR LOS NIÑOS:"
-          valor={formData.recoleccionMaterial}
+          campo="recoleccionMaterial"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
+
 
         <TituloSeccion>
           9. EVALUACIÓN DEL ENTRENAMIENTO
         </TituloSeccion>
 
+
         <Fila
           titulo="PUNTOS POSITIVOS:"
-          valor={formData.puntosPositivos}
+          campo="puntosPositivos"
+          tipo="textarea"
         />
+
 
         <Fila
           titulo="PUNTOS A MEJORAR:"
-          valor={formData.puntosMejorar}
+          campo="puntosMejorar"
+          tipo="textarea"
         />
+
 
         <Fila
           titulo="SESIÓN ADAPTADA AL NIVEL Y A LA EDAD DE LOS NIÑOS:"
-          valor={formData.sesionAdaptada}
+          campo="sesionAdaptada"
+          tipo="select"
+          opciones={opcionesSiNo}
         />
 
       </div>
 
 
-      {/* HOJA 2 */}
+      {/* ========================================= */}
+      {/* HOJA 2                                    */}
+      {/* ========================================= */}
+
       <div className="hoja-planilla segunda-hoja">
 
         <div className="cabecera-documento">
@@ -280,30 +584,75 @@ function PlanillaPreview({ formData }) {
             className="logo-documento"
           />
 
+
           <div className="texto-cabecera">
-            <div>VISORÍA DE LICENCIA C</div>
+
+            <div>
+              VISORÍA DE LICENCIA C
+            </div>
 
             <strong>
               ASIGNATURA TÉCNICO - TÁCTICO
             </strong>
+
           </div>
 
         </div>
+
 
         <TituloSeccion>
           OTROS DATOS DE LA SESIÓN
         </TituloSeccion>
 
-        <div className="campo-grande-planilla">
-          {mostrar(formData.otrosDatos)}
+
+        <div
+          className={
+            editable
+              ? "campo-grande-planilla campo-editable"
+              : "campo-grande-planilla"
+          }
+
+          onClick={() =>
+            editarCampo({
+              campo: "otrosDatos",
+              titulo: "Otros datos de la sesión",
+              tipo: "textarea",
+            })
+          }
+        >
+          {mostrar(formData.otrosDatos) || (
+            editable
+              ? <span className="campo-vacio">Editar...</span>
+              : ""
+          )}
         </div>
+
 
         <TituloSeccion>
           PLANIFICACIÓN GRÁFICA
         </TituloSeccion>
 
-        <div className="campo-grafico-planilla">
-          {mostrar(formData.planificacionGrafica)}
+
+        <div
+          className={
+            editable
+              ? "campo-grafico-planilla campo-editable"
+              : "campo-grafico-planilla"
+          }
+
+          onClick={() =>
+            editarCampo({
+              campo: "planificacionGrafica",
+              titulo: "Planificación gráfica / descripción",
+              tipo: "textarea",
+            })
+          }
+        >
+          {mostrar(formData.planificacionGrafica) || (
+            editable
+              ? <span className="campo-vacio">Editar...</span>
+              : ""
+          )}
         </div>
 
       </div>

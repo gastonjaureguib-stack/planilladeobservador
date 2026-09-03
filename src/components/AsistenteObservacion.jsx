@@ -1,7 +1,10 @@
 import Swal from "sweetalert2";
 
-function AsistenteObservacion({ formData, setFormData }) {
-  // Evita problemas al colocar valores escritos dentro del HTML de SweetAlert
+function AsistenteObservacion({
+  formData,
+  setFormData,
+  onFinalizar,
+}) {
   const escapar = (valor = "") => {
     return String(valor)
       .replaceAll("&", "&amp;")
@@ -10,12 +13,10 @@ function AsistenteObservacion({ formData, setFormData }) {
       .replaceAll(">", "&gt;");
   };
 
-  // Lee un input del SweetAlert
   const valor = (id) => {
     return document.getElementById(id)?.value || "";
   };
 
-  // Guarda cada paso también en React
   const guardarPaso = (datos) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,8 +24,11 @@ function AsistenteObservacion({ formData, setFormData }) {
     }));
   };
 
-  // HTML reutilizable para los Sí / No
-  const selectSiNo = (id, label, seleccionado = "") => {
+  const selectSiNo = (
+    id,
+    label,
+    seleccionado = ""
+  ) => {
     return `
       <label>
         ${label}
@@ -33,15 +37,24 @@ function AsistenteObservacion({ formData, setFormData }) {
           id="${id}"
           class="swal2-select"
         >
-          <option value="" ${seleccionado === "" ? "selected" : ""}>
+          <option
+            value=""
+            ${seleccionado === "" ? "selected" : ""}
+          >
             Seleccionar
           </option>
 
-          <option value="Sí" ${seleccionado === "Sí" ? "selected" : ""}>
+          <option
+            value="Sí"
+            ${seleccionado === "Sí" ? "selected" : ""}
+          >
             Sí
           </option>
 
-          <option value="No" ${seleccionado === "No" ? "selected" : ""}>
+          <option
+            value="No"
+            ${seleccionado === "No" ? "selected" : ""}
+          >
             No
           </option>
         </select>
@@ -50,18 +63,12 @@ function AsistenteObservacion({ formData, setFormData }) {
   };
 
   const iniciarAsistente = async () => {
-    /*
-      Creamos una copia local.
-
-      Esto es importante porque setFormData actualiza React,
-      pero nosotros queremos que los pasos siguientes tengan
-      inmediatamente los valores anteriores.
-    */
-    let datos = { ...formData };
+    let datos = {
+      ...formData,
+    };
 
     // =====================================================
     // PASO 1
-    // DATOS DE LA OBSERVACIÓN
     // =====================================================
 
     const paso1 = await Swal.fire({
@@ -120,17 +127,26 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          nombreObservador: valor("nombreObservador"),
-          fechaObservacion: valor("fechaObservacion"),
-          fechaEntrega: valor("fechaEntrega"),
-          firmaProfesor: valor("firmaProfesor"),
-        };
-      },
+      confirmButtonText:
+        "Continuar →",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        nombreObservador:
+          valor("nombreObservador"),
+
+        fechaObservacion:
+          valor("fechaObservacion"),
+
+        fechaEntrega:
+          valor("fechaEntrega"),
+
+        firmaProfesor:
+          valor("firmaProfesor"),
+      }),
     });
 
     if (!paso1.isConfirmed) return;
@@ -144,7 +160,6 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 2
-    // DATOS GENERALES
     // =====================================================
 
     const paso2 = await Swal.fire({
@@ -205,17 +220,26 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          club: valor("club"),
-          categoria: valor("categoria"),
-          jugadoresPresentes: valor("jugadoresPresentes"),
-          practicasSemanales: valor("practicasSemanales"),
-        };
-      },
+      confirmButtonText:
+        "Continuar →",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        club:
+          valor("club"),
+
+        categoria:
+          valor("categoria"),
+
+        jugadoresPresentes:
+          valor("jugadoresPresentes"),
+
+        practicasSemanales:
+          valor("practicasSemanales"),
+      }),
     });
 
     if (!paso2.isConfirmed) return;
@@ -229,7 +253,6 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 3
-    // EL TÉCNICO
     // =====================================================
 
     const paso3 = await Swal.fire({
@@ -280,17 +303,26 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          tecnicoNombre: valor("tecnicoNombre"),
-          experienciaJugador: valor("experienciaJugador"),
-          capacitacionEntrenador: valor("capacitacionEntrenador"),
-          entrenaEquipo: valor("entrenaEquipo"),
-        };
-      },
+      confirmButtonText:
+        "Continuar →",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        tecnicoNombre:
+          valor("tecnicoNombre"),
+
+        experienciaJugador:
+          valor("experienciaJugador"),
+
+        capacitacionEntrenador:
+          valor("capacitacionEntrenador"),
+
+        entrenaEquipo:
+          valor("entrenaEquipo"),
+      }),
     });
 
     if (!paso3.isConfirmed) return;
@@ -304,11 +336,12 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 4
-    // LA PRÁCTICA
     // =====================================================
 
     const paso4 = await Swal.fire({
       title: "La práctica",
+
+      width: 650,
 
       html: `
         <div class="swal-form">
@@ -375,23 +408,38 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      width: 650,
+      confirmButtonText:
+        "Continuar →",
 
-      preConfirm: () => {
-        return {
-          estructuraSesion: valor("estructuraSesion"),
-          tomaGrupo: valor("tomaGrupo"),
-          presentacionTrabajo: valor("presentacionTrabajo"),
-          calentamiento: valor("calentamiento"),
-          partePrincipal: valor("partePrincipal"),
-          aprendizajeJuego: valor("aprendizajeJuego"),
-          evaluacionJugadores: valor("evaluacionJugadores"),
-          tiempoSesion: valor("tiempoSesion"),
-        };
-      },
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        estructuraSesion:
+          valor("estructuraSesion"),
+
+        tomaGrupo:
+          valor("tomaGrupo"),
+
+        presentacionTrabajo:
+          valor("presentacionTrabajo"),
+
+        calentamiento:
+          valor("calentamiento"),
+
+        partePrincipal:
+          valor("partePrincipal"),
+
+        aprendizajeJuego:
+          valor("aprendizajeJuego"),
+
+        evaluacionJugadores:
+          valor("evaluacionJugadores"),
+
+        tiempoSesion:
+          valor("tiempoSesion"),
+      }),
     });
 
     if (!paso4.isConfirmed) return;
@@ -405,11 +453,11 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 5
-    // MATERIAL E INFRAESTRUCTURA
     // =====================================================
 
     const paso5 = await Swal.fire({
-      title: "Material e infraestructura",
+      title:
+        "Material e infraestructura",
 
       html: `
         <div class="swal-form">
@@ -466,19 +514,32 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          espacioDisponible: valor("espacioDisponible"),
-          materialDisponible: valor("materialDisponible"),
-          actitudPedagogica: valor("actitudPedagogica"),
-          presentacion: valor("presentacion"),
-          demostracion: valor("demostracion"),
-          consignasCorrectas: valor("consignasCorrectas"),
-        };
-      },
+      confirmButtonText:
+        "Continuar →",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        espacioDisponible:
+          valor("espacioDisponible"),
+
+        materialDisponible:
+          valor("materialDisponible"),
+
+        actitudPedagogica:
+          valor("actitudPedagogica"),
+
+        presentacion:
+          valor("presentacion"),
+
+        demostracion:
+          valor("demostracion"),
+
+        consignasCorrectas:
+          valor("consignasCorrectas"),
+      }),
     });
 
     if (!paso5.isConfirmed) return;
@@ -492,11 +553,11 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 6
-    // SESIÓN + CLIMA DE APRENDIZAJE
     // =====================================================
 
     const paso6 = await Swal.fire({
-      title: "Sesión y clima de aprendizaje",
+      title:
+        "Sesión y clima de aprendizaje",
 
       html: `
         <div class="swal-form">
@@ -545,22 +606,29 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          alcancesSesion: valor("alcancesSesion"),
-          planificacionCortoLargoPlazo:
-            valor("planificacionCortoLargoPlazo"),
-          comportamientoEducador:
-            valor("comportamientoEducador"),
-          participacionNinos:
-            valor("participacionNinos"),
-          recoleccionMaterial:
-            valor("recoleccionMaterial"),
-        };
-      },
+      confirmButtonText:
+        "Continuar →",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        alcancesSesion:
+          valor("alcancesSesion"),
+
+        planificacionCortoLargoPlazo:
+          valor("planificacionCortoLargoPlazo"),
+
+        comportamientoEducador:
+          valor("comportamientoEducador"),
+
+        participacionNinos:
+          valor("participacionNinos"),
+
+        recoleccionMaterial:
+          valor("recoleccionMaterial"),
+      }),
     });
 
     if (!paso6.isConfirmed) return;
@@ -574,11 +642,11 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 7
-    // EVALUACIÓN
     // =====================================================
 
     const paso7 = await Swal.fire({
-      title: "Evaluación del entrenamiento",
+      title:
+        "Evaluación del entrenamiento",
 
       html: `
         <div class="swal-form">
@@ -593,7 +661,6 @@ function AsistenteObservacion({ formData, setFormData }) {
             <textarea
               id="puntosPositivos"
               class="swal2-textarea"
-              placeholder="Describí los aspectos positivos observados"
             >${escapar(datos.puntosPositivos)}</textarea>
           </label>
 
@@ -603,7 +670,6 @@ function AsistenteObservacion({ formData, setFormData }) {
             <textarea
               id="puntosMejorar"
               class="swal2-textarea"
-              placeholder="Describí los aspectos que podrían mejorar"
             >${escapar(datos.puntosMejorar)}</textarea>
           </label>
 
@@ -617,16 +683,23 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Continuar →",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          puntosPositivos: valor("puntosPositivos"),
-          puntosMejorar: valor("puntosMejorar"),
-          sesionAdaptada: valor("sesionAdaptada"),
-        };
-      },
+      confirmButtonText:
+        "Continuar →",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        puntosPositivos:
+          valor("puntosPositivos"),
+
+        puntosMejorar:
+          valor("puntosMejorar"),
+
+        sesionAdaptada:
+          valor("sesionAdaptada"),
+      }),
     });
 
     if (!paso7.isConfirmed) return;
@@ -640,7 +713,6 @@ function AsistenteObservacion({ formData, setFormData }) {
 
     // =====================================================
     // PASO 8
-    // SEGUNDA HOJA
     // =====================================================
 
     const paso8 = await Swal.fire({
@@ -659,7 +731,6 @@ function AsistenteObservacion({ formData, setFormData }) {
             <textarea
               id="otrosDatos"
               class="swal2-textarea"
-              placeholder="Agregá cualquier observación adicional"
             >${escapar(datos.otrosDatos)}</textarea>
           </label>
 
@@ -669,7 +740,6 @@ function AsistenteObservacion({ formData, setFormData }) {
             <textarea
               id="planificacionGrafica"
               class="swal2-textarea"
-              placeholder="Describí la planificación o ejercicio realizado"
             >${escapar(datos.planificacionGrafica)}</textarea>
           </label>
 
@@ -677,15 +747,20 @@ function AsistenteObservacion({ formData, setFormData }) {
       `,
 
       showCancelButton: true,
-      confirmButtonText: "Finalizar ✓",
-      cancelButtonText: "Cancelar",
 
-      preConfirm: () => {
-        return {
-          otrosDatos: valor("otrosDatos"),
-          planificacionGrafica: valor("planificacionGrafica"),
-        };
-      },
+      confirmButtonText:
+        "Finalizar y guardar ✓",
+
+      cancelButtonText:
+        "Cancelar",
+
+      preConfirm: () => ({
+        otrosDatos:
+          valor("otrosDatos"),
+
+        planificacionGrafica:
+          valor("planificacionGrafica"),
+      }),
     });
 
     if (!paso8.isConfirmed) return;
@@ -695,64 +770,37 @@ function AsistenteObservacion({ formData, setFormData }) {
       ...paso8.value,
     };
 
-    guardarPaso(paso8.value);
+    setFormData(datos);
 
-    // =====================================================
-    // FINAL
-    // =====================================================
-
-    await Swal.fire({
-      icon: "success",
-      title: "¡Observación completa!",
-      html: `
-        <div style="text-align:center">
-          <p>
-            Completaste todos los datos de la observación.
-          </p>
-
-          <p style="color:#777;font-size:14px">
-            La planilla ya está preparada para revisar.
-          </p>
-        </div>
-      `,
-      confirmButtonText: "Ver planilla",
-    });
-
-    /*
-      Buscamos la preview y bajamos automáticamente
-      hasta ella.
-    */
-    setTimeout(() => {
-      const preview = document.querySelector(".zona-preview");
-
-      if (preview) {
-        preview.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 150);
+    if (onFinalizar) {
+      await onFinalizar(datos);
+    }
   };
 
   return (
     <div className="inicio-asistente">
+
       <img
-        src="/logosplanilla.png"
+        src="/logoplanilla.png"
         alt="Logo de la planilla"
         className="logo-asistente"
       />
 
-      <h2>Nueva observación</h2>
+      <h2>
+        Nueva observación
+      </h2>
 
       <p>
-        Completá la observación paso a paso. Al finalizar podrás
-        revisar la planilla completa antes de guardarla.
+        Completá la observación paso a paso.
+        Al finalizar se guardará en Mis observaciones.
       </p>
 
       <div className="info-asistente">
         <span>8 pasos</span>
         <span>•</span>
-        <span>Podés revisar antes de guardar</span>
+        <span>
+          Se guarda un borrador automáticamente
+        </span>
       </div>
 
       <button
@@ -760,8 +808,9 @@ function AsistenteObservacion({ formData, setFormData }) {
         className="btn-comenzar"
         onClick={iniciarAsistente}
       >
-        Comenzar observación
+        Continuar / completar observación
       </button>
+
     </div>
   );
 }
