@@ -16,7 +16,6 @@ import {
 
 import {
   descargarPDF,
-  compartirPDF,
 } from "./utils/pdfService";
 
 const observacionInicial = {
@@ -67,77 +66,57 @@ const observacionInicial = {
   planificacionGrafica: "",
 };
 
-const BORRADOR_KEY =
-  "borrador_observacion";
+const BORRADOR_KEY = "borrador_observacion";
 
 function App() {
-  const [vista, setVista] =
-    useState("nueva");
+  const [vista, setVista] = useState("nueva");
 
-  const [formData, setFormData] =
-    useState(() => {
-      try {
-        const borrador =
-          localStorage.getItem(
-            BORRADOR_KEY
-          );
+  const [formData, setFormData] = useState(() => {
+    try {
+      const borrador = localStorage.getItem(BORRADOR_KEY);
 
-        return borrador
-          ? {
-              ...observacionInicial,
-              ...JSON.parse(borrador),
-            }
-          : {
-              ...observacionInicial,
-            };
-      } catch {
-        return {
-          ...observacionInicial,
-        };
-      }
-    });
+      return borrador
+        ? {
+            ...observacionInicial,
+            ...JSON.parse(borrador),
+          }
+        : {
+            ...observacionInicial,
+          };
+    } catch {
+      return {
+        ...observacionInicial,
+      };
+    }
+  });
 
-  const [observaciones, setObservaciones] =
-    useState([]);
+  const [observaciones, setObservaciones] = useState([]);
 
-  const [
-    observacionEditando,
-    setObservacionEditando,
-  ] = useState(null);
+  const [observacionEditando, setObservacionEditando] =
+    useState(null);
 
-  const [
-    observacionSeleccionada,
-    setObservacionSeleccionada,
-  ] = useState(null);
+  const [observacionSeleccionada, setObservacionSeleccionada] =
+    useState(null);
 
-  const [
-    nombrePlanillaEditando,
-    setNombrePlanillaEditando,
-  ] = useState("");
-
-  const [busqueda, setBusqueda] =
+  const [nombrePlanillaEditando, setNombrePlanillaEditando] =
     useState("");
 
-  const [cargando, setCargando] =
-    useState(true);
+  const [busqueda, setBusqueda] = useState("");
 
-  // ==========================================
-  // BORRADOR
-  // ==========================================
+  const [cargando, setCargando] = useState(true);
+
+  // =====================================================
+  // BORRADOR LOCAL DE SEGURIDAD
+  // =====================================================
 
   useEffect(() => {
-    if (
-      vista !== "nueva" &&
-      vista !== "editar"
-    ) {
+    if (vista !== "nueva" && vista !== "editar") {
       return;
     }
 
-    const hayDatos =
-      Object.values(formData).some(
-        (valor) =>
-          String(valor || "").trim() !== ""
-      );
+    const hayDatos = Object.values(formData).some(
+      (valor) => String(valor || "").trim() !== ""
+    );
 
     if (hayDatos) {
       localStorage.setItem(
@@ -145,121 +124,195 @@ function App() {
         JSON.stringify(formData)
       );
     } else {
-      localStorage.removeItem(
-        BORRADOR_KEY
-      );
+      localStorage.removeItem(BORRADOR_KEY);
     }
   }, [formData, vista]);
 
-  // ==========================================
-  // SUPABASE
-  // ==========================================
+  // =====================================================
+  // CARGAR OBSERVACIONES DESDE SUPABASE
+  // =====================================================
 
-  const cargarObservaciones =
-    async () => {
-      try {
-        setCargando(true);
+  const cargarObservaciones = async () => {
+    try {
+      setCargando(true);
 
-        const data =
-          await obtenerObservaciones();
+      const data = await obtenerObservaciones();
 
-        setObservaciones(
-          data || []
-        );
+      setObservaciones(data || []);
 
-        return data || [];
-      } catch (error) {
-        console.error(
-          "Error cargando observaciones:",
-          error
-        );
+      return data || [];
+    } catch (error) {
+      console.error(
+        "Error cargando observaciones:",
+        error
+      );
 
-        await Swal.fire({
-          icon: "error",
-          title:
-            "No se pudieron cargar las planillas",
-          text:
-            error?.message ||
-            "No se pudo conectar con Supabase.",
-        });
+      await Swal.fire({
+        icon: "error",
+        title: "No se pudieron cargar las planillas",
+        text:
+          error?.message ||
+          "No se pudo conectar con Supabase.",
+      });
 
-        return [];
-      } finally {
-        setCargando(false);
-      }
-    };
+      return [];
+    } finally {
+      setCargando(false);
+    }
+  };
 
   useEffect(() => {
     cargarObservaciones();
   }, []);
 
-  // ==========================================
-  // NUEVA
-  // ==========================================
+  // =====================================================
+  // NUEVA OBSERVACIÓN
+  // =====================================================
 
-  const nuevaObservacion =
-    async () => {
-      const borradorGuardado =
-        localStorage.getItem(
-          BORRADOR_KEY
+  const nuevaObservacion = async () => {
+    const borradorGuardado =
+      localStorage.getItem(BORRADOR_KEY);
+
+    if (borradorGuardado) {
+      let borrador = null;
+
+      try {
+        borrador = JSON.parse(
+          borradorGuardado
         );
+      } catch {
+        borrador = null;
+      }
 
-      if (borradorGuardado) {
-        let borrador = null;
+      if (borrador) {
+        const resultado = await Swal.fire({
+          icon: "question",
+          title: "Hay una planilla sin terminar",
+          text:
+            "¿Querés continuarla o empezar una nueva?",
+          showDenyButton: true,
+          showCancelButton: true,
+          confirmButtonText: "Continuar",
+          denyButtonText: "Empezar nueva",
+          cancelButtonText: "Cancelar",
+        });
 
-        try {
-          borrador =
-            JSON.parse(
-              borradorGuardado
-            );
-        } catch {
-          borrador = null;
+        if (resultado.isConfirmed) {
+          setFormData({
+            ...observacionInicial,
+            ...borrador,
+          });
+
+          setVista("nueva");
+          setObservacionEditando(null);
+          setObservacionSeleccionada(null);
+
+          return;
         }
 
-        if (borrador) {
-          const resultado =
-            await Swal.fire({
-              icon: "question",
-              title:
-                "Hay una planilla sin terminar",
-              text:
-                "¿Querés continuarla o empezar una nueva?",
-              showDenyButton: true,
-              showCancelButton: true,
-              confirmButtonText:
-                "Continuar",
-              denyButtonText:
-                "Empezar nueva",
-              cancelButtonText:
-                "Cancelar",
-            });
-
-          if (
-            resultado.isConfirmed
-          ) {
-            setFormData({
-              ...observacionInicial,
-              ...borrador,
-            });
-
-            setVista("nueva");
-
-            setObservacionEditando(
-              null
-            );
-
-            setObservacionSeleccionada(
-              null
-            );
-
-            return;
-          }
-
-          if (!resultado.isDenied) {
-            return;
-          }
+        if (!resultado.isDenied) {
+          return;
         }
       }
+    }
+
+    localStorage.removeItem(BORRADOR_KEY);
+
+    setFormData({
+      ...observacionInicial,
+    });
+
+    setObservacionEditando(null);
+    setObservacionSeleccionada(null);
+    setNombrePlanillaEditando("");
+
+    setVista("nueva");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // =====================================================
+  // FINALIZAR Y GUARDAR NUEVA PLANILLA
+  // =====================================================
+
+  const finalizarObservacion = async (datosFinales) => {
+    setFormData(datosFinales);
+
+    localStorage.setItem(
+      BORRADOR_KEY,
+      JSON.stringify(datosFinales)
+    );
+
+    const resultadoNombre = await Swal.fire({
+      title: "Guardar planilla",
+
+      text:
+        "Poné un nombre para encontrarla fácilmente después.",
+
+      input: "text",
+
+      inputValue:
+        datosFinales.club || "",
+
+      inputPlaceholder:
+        "Ej: Independiente - Categoría 2017",
+
+      showCancelButton: true,
+
+      confirmButtonText: "Guardar planilla",
+
+      cancelButtonText: "Volver",
+
+      inputValidator: (value) => {
+        if (!value?.trim()) {
+          return "Escribí un nombre para la planilla.";
+        }
+      },
+    });
+
+    if (!resultadoNombre.isConfirmed) {
+      return;
+    }
+
+    const nombrePlanilla =
+      resultadoNombre.value.trim();
+
+    try {
+      Swal.fire({
+        title: "Guardando planilla...",
+
+        text:
+          "No cierres esta ventana.",
+
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const guardada =
+        await crearObservacion(
+          nombrePlanilla,
+          datosFinales
+        );
+
+      if (!guardada?.id) {
+        throw new Error(
+          "Supabase no confirmó el guardado."
+        );
+      }
+
+      const actualizadas =
+        await obtenerObservaciones();
+
+      setObservaciones(
+        actualizadas || []
+      );
 
       localStorage.removeItem(
         BORRADOR_KEY
@@ -271,264 +324,136 @@ function App() {
 
       setObservacionEditando(null);
       setObservacionSeleccionada(null);
-
-      setNombrePlanillaEditando(
-        ""
-      );
-
-      setVista("nueva");
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    };
-
-  // ==========================================
-  // GUARDAR NUEVA
-  // ==========================================
-
-  const finalizarObservacion =
-    async (datosFinales) => {
-      setFormData(
-        datosFinales
-      );
-
-      localStorage.setItem(
-        BORRADOR_KEY,
-        JSON.stringify(
-          datosFinales
-        )
-      );
-
-      const resultadoNombre =
-        await Swal.fire({
-          title:
-            "Guardar planilla",
-
-          text:
-            "Poné un nombre para encontrarla fácilmente después.",
-
-          input: "text",
-
-          inputValue:
-            datosFinales.club || "",
-
-          inputPlaceholder:
-            "Ej: Independiente - Categoría 2017",
-
-          showCancelButton: true,
-
-          confirmButtonText:
-            "Guardar planilla",
-
-          cancelButtonText:
-            "Volver",
-
-          inputValidator:
-            (value) => {
-              if (!value?.trim()) {
-                return "Escribí un nombre para la planilla.";
-              }
-            },
-        });
-
-      if (
-        !resultadoNombre.isConfirmed
-      ) {
-        return;
-      }
-
-      const nombrePlanilla =
-        resultadoNombre.value.trim();
-
-      try {
-        Swal.fire({
-          title:
-            "Guardando planilla...",
-
-          text:
-            "No cierres esta ventana.",
-
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        const guardada =
-          await crearObservacion(
-            nombrePlanilla,
-            datosFinales
-          );
-
-        if (!guardada?.id) {
-          throw new Error(
-            "Supabase no confirmó el guardado."
-          );
-        }
-
-        const actualizadas =
-          await obtenerObservaciones();
-
-        setObservaciones(
-          actualizadas || []
-        );
-
-        localStorage.removeItem(
-          BORRADOR_KEY
-        );
-
-        setFormData({
-          ...observacionInicial,
-        });
-
-        setObservacionEditando(
-          null
-        );
-
-        setObservacionSeleccionada(
-          null
-        );
-
-        setNombrePlanillaEditando(
-          ""
-        );
-
-        setVista("historial");
-
-        await Swal.fire({
-          icon: "success",
-          title:
-            "Planilla guardada",
-          text: `"${nombrePlanilla}" quedó guardada correctamente.`,
-          confirmButtonText:
-            "Aceptar",
-        });
-      } catch (error) {
-        console.error(
-          "Error guardando:",
-          error
-        );
-
-        await Swal.fire({
-          icon: "error",
-          title:
-            "No se pudo guardar",
-
-          html: `
-            <p>La información no se perdió.</p>
-            <p>Quedó guardada como borrador en este dispositivo.</p>
-            <p style="font-size:12px;margin-top:12px">
-              ${
-                error?.message ||
-                "Error desconocido"
-              }
-            </p>
-          `,
-        });
-      }
-    };
-
-  // ==========================================
-  // CONVERTIR DATOS
-  // ==========================================
-
-  const obtenerDatosFormulario =
-    (observacion) => ({
-      ...observacionInicial,
-      ...(observacion?.datos ||
-        {}),
-    });
-
-  // ==========================================
-  // HISTORIAL
-  // ==========================================
-
-  const abrirHistorial =
-    async () => {
-      await cargarObservaciones();
+      setNombrePlanillaEditando("");
 
       setVista("historial");
-    };
 
-  // ==========================================
-  // VER
-  // ==========================================
+      await Swal.fire({
+        icon: "success",
+        title: "Planilla guardada",
+        text: `"${nombrePlanilla}" quedó guardada correctamente.`,
+        confirmButtonText: "Aceptar",
+      });
+    } catch (error) {
+      console.error(
+        "Error guardando:",
+        error
+      );
 
-  const verObservacion =
-    (observacion) => {
-      setObservacionSeleccionada(
+      await Swal.fire({
+        icon: "error",
+        title: "No se pudo guardar",
+
+        html: `
+          <p>La información no se perdió.</p>
+          <p>Quedó guardada como borrador en este dispositivo.</p>
+          <p style="font-size:12px;margin-top:12px">
+            ${
+              error?.message ||
+              "Error desconocido"
+            }
+          </p>
+        `,
+      });
+    }
+  };
+
+  // =====================================================
+  // REGISTRO SUPABASE → DATOS DEL FORMULARIO
+  // =====================================================
+
+  const obtenerDatosFormulario = (
+    observacion
+  ) => ({
+    ...observacionInicial,
+    ...(observacion?.datos || {}),
+  });
+
+  // =====================================================
+  // ABRIR HISTORIAL
+  // =====================================================
+
+  const abrirHistorial = async () => {
+    await cargarObservaciones();
+
+    setVista("historial");
+  };
+
+  // =====================================================
+  // VER OBSERVACIÓN
+  // =====================================================
+
+  const verObservacion = (
+    observacion
+  ) => {
+    setObservacionSeleccionada(
+      observacion
+    );
+
+    setFormData(
+      obtenerDatosFormulario(
+        observacion
+      )
+    );
+
+    setNombrePlanillaEditando(
+      observacion.nombre_planilla ||
+        ""
+    );
+
+    setObservacionEditando(null);
+
+    setVista("ver");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // =====================================================
+  // EDITAR OBSERVACIÓN
+  // =====================================================
+
+  const editarObservacion = (
+    observacion
+  ) => {
+    const datos =
+      obtenerDatosFormulario(
         observacion
       );
 
-      setFormData(
-        obtenerDatosFormulario(
-          observacion
-        )
-      );
+    setObservacionSeleccionada(
+      observacion
+    );
 
-      setNombrePlanillaEditando(
-        observacion.nombre_planilla ||
-          ""
-      );
+    setFormData(datos);
 
-      setObservacionEditando(
-        null
-      );
+    setObservacionEditando(
+      observacion.id
+    );
 
-      setVista("ver");
+    setNombrePlanillaEditando(
+      observacion.nombre_planilla ||
+        ""
+    );
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    };
+    localStorage.setItem(
+      BORRADOR_KEY,
+      JSON.stringify(datos)
+    );
 
-  // ==========================================
-  // EDITAR
-  // ==========================================
+    setVista("editar");
 
-  const editarObservacion =
-    (observacion) => {
-      const datos =
-        obtenerDatosFormulario(
-          observacion
-        );
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
-      setObservacionSeleccionada(
-        observacion
-      );
-
-      setFormData(datos);
-
-      setObservacionEditando(
-        observacion.id
-      );
-
-      setNombrePlanillaEditando(
-        observacion.nombre_planilla ||
-          ""
-      );
-
-      localStorage.setItem(
-        BORRADOR_KEY,
-        JSON.stringify(datos)
-      );
-
-      setVista("editar");
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    };
-
-  // ==========================================
+  // =====================================================
   // GUARDAR EDICIÓN
-  // ==========================================
+  // =====================================================
 
   const guardarEdicionDirecta =
     async () => {
@@ -577,24 +502,15 @@ function App() {
           ...observacionInicial,
         });
 
-        setObservacionEditando(
-          null
-        );
-
-        setObservacionSeleccionada(
-          null
-        );
-
-        setNombrePlanillaEditando(
-          ""
-        );
+        setObservacionEditando(null);
+        setObservacionSeleccionada(null);
+        setNombrePlanillaEditando("");
 
         setVista("historial");
 
         await Swal.fire({
           icon: "success",
-          title:
-            "Cambios guardados",
+          title: "Cambios guardados",
           text:
             "La planilla fue actualizada correctamente.",
         });
@@ -615,9 +531,9 @@ function App() {
       }
     };
 
-  // ==========================================
+  // =====================================================
   // CANCELAR EDICIÓN
-  // ==========================================
+  // =====================================================
 
   const cancelarEdicion =
     async () => {
@@ -640,9 +556,7 @@ function App() {
             "Seguir editando",
         });
 
-      if (
-        !resultado.isConfirmed
-      ) {
+      if (!resultado.isConfirmed) {
         return;
       }
 
@@ -650,17 +564,9 @@ function App() {
         BORRADOR_KEY
       );
 
-      setObservacionEditando(
-        null
-      );
-
-      setObservacionSeleccionada(
-        null
-      );
-
-      setNombrePlanillaEditando(
-        ""
-      );
+      setObservacionEditando(null);
+      setObservacionSeleccionada(null);
+      setNombrePlanillaEditando("");
 
       setFormData({
         ...observacionInicial,
@@ -669,9 +575,9 @@ function App() {
       setVista("historial");
     };
 
-  // ==========================================
+  // =====================================================
   // ELIMINAR
-  // ==========================================
+  // =====================================================
 
   const eliminarObservacion =
     async (observacion) => {
@@ -696,9 +602,7 @@ function App() {
             "#b42318",
         });
 
-      if (
-        !resultado.isConfirmed
-      ) {
+      if (!resultado.isConfirmed) {
         return;
       }
 
@@ -741,9 +645,9 @@ function App() {
       }
     };
 
-  // ==========================================
+  // =====================================================
   // BUSCAR
-  // ==========================================
+  // =====================================================
 
   const ejecutarBusqueda =
     async () => {
@@ -780,9 +684,9 @@ function App() {
       await cargarObservaciones();
     };
 
-  // ==========================================
+  // =====================================================
   // DESCARGAR PDF
-  // ==========================================
+  // =====================================================
 
   const generarPDF = async () => {
     try {
@@ -823,58 +727,9 @@ function App() {
     }
   };
 
-  // ==========================================
-  // COMPARTIR PDF
-  // ==========================================
-
-  const compartirPlanillaPDF =
-    async () => {
-      try {
-        Swal.fire({
-          title:
-            "Preparando PDF...",
-
-          allowOutsideClick: false,
-
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        await compartirPDF(
-          nombrePlanillaEditando ||
-            formData.club ||
-            "planilla-observacion"
-        );
-
-        Swal.close();
-      } catch (error) {
-        console.error(error);
-
-        if (
-          error?.name ===
-          "AbortError"
-        ) {
-          Swal.close();
-          return;
-        }
-
-        await Swal.fire({
-          icon: "error",
-
-          title:
-            "No se pudo compartir",
-
-          text:
-            error?.message ||
-            "No se pudo preparar el archivo.",
-        });
-      }
-    };
-
-  // ==========================================
-  // PDF DESDE HISTORIAL
-  // ==========================================
+  // =====================================================
+  // PDF DESDE EL HISTORIAL
+  // =====================================================
 
   const imprimirObservacion =
     (observacion) => {
@@ -919,9 +774,9 @@ function App() {
       }, 500);
     };
 
-  // ==========================================
+  // =====================================================
   // RENDER
-  // ==========================================
+  // =====================================================
 
   return (
     <div className="app">
@@ -1013,9 +868,7 @@ function App() {
               <div>
 
                 <strong>
-                  {
-                    nombrePlanillaEditando
-                  }
+                  {nombrePlanillaEditando}
                 </strong>
 
                 <span>
@@ -1188,16 +1041,6 @@ function App() {
                 onClick={generarPDF}
               >
                 Descargar PDF
-              </button>
-
-              <button
-                type="button"
-                className="btn-secundario"
-                onClick={
-                  compartirPlanillaPDF
-                }
-              >
-                Compartir PDF
               </button>
 
             </div>

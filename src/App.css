@@ -6,10 +6,20 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-width: 320px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
   background: #f5f7f9;
   color: #1f2933;
 }
@@ -35,26 +45,33 @@ button {
 ========================================= */
 
 .header {
-  background: #ffffff;
-  border-bottom: 1px solid #e4e7eb;
   padding: 22px 40px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   gap: 30px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e4e7eb;
 }
 
 .header h1 {
   margin: 0;
+
   font-size: 22px;
   font-weight: 700;
+
   color: #17202a;
 }
 
 .header p {
   margin: 5px 0 0;
+
   font-size: 13px;
+
   color: #7b8794;
 }
 
@@ -64,12 +81,13 @@ button {
 }
 
 .header nav button {
+  padding: 10px 17px;
+
   border: 1px solid #d7dce1;
+  border-radius: 8px;
+
   background: #ffffff;
   color: #344050;
-
-  padding: 10px 17px;
-  border-radius: 8px;
 
   font-size: 14px;
   font-weight: 600;
@@ -87,30 +105,35 @@ button {
 ========================================= */
 
 main {
-  width: min(1100px, calc(100% - 40px));
+  width: min(
+    1100px,
+    calc(100% - 40px)
+  );
+
   margin: 0 auto;
+
   padding: 45px 0 80px;
 }
 
 
 /* =========================================
-   PANTALLA INICIAL DEL ASISTENTE
+   ASISTENTE
 ========================================= */
 
 .inicio-asistente {
   width: min(620px, 100%);
+
   margin: 20px auto 50px;
+
   padding: 45px 40px;
 
   background: #ffffff;
+
   border: 1px solid #e3e7eb;
   border-radius: 16px;
 
   text-align: center;
 }
-
-
-/* ESTE ES EL LOGO DE LA PANTALLA PRINCIPAL */
 
 .logo-asistente {
   display: block;
@@ -119,31 +142,50 @@ main {
   max-width: 130px !important;
   height: auto !important;
 
-  object-fit: contain;
-
   margin: 0 auto 25px;
+
+  object-fit: contain;
 }
 
 .inicio-asistente h2 {
   margin: 0 0 12px;
+
   font-size: 28px;
+
   color: #1d2733;
 }
 
 .inicio-asistente p {
   max-width: 450px;
+
   margin: 0 auto 30px;
 
   font-size: 15px;
   line-height: 1.7;
+
   color: #687481;
 }
 
+.info-asistente {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin: -15px 0 28px;
+
+  color: #8a949e;
+
+  font-size: 13px;
+}
+
 .btn-comenzar {
+  padding: 14px 26px;
+
   border: none;
   border-radius: 9px;
-
-  padding: 14px 26px;
 
   background: #263746;
   color: white;
@@ -160,16 +202,18 @@ main {
 
 
 /* =========================================
-   SWEET ALERT - ASISTENTE
+   SWEET ALERT
 ========================================= */
 
 .swal2-popup {
   border-radius: 16px !important;
+
   padding: 28px !important;
 }
 
 .swal2-title {
   color: #202b36 !important;
+
   font-size: 24px !important;
 }
 
@@ -183,17 +227,22 @@ main {
   text-align: center;
 
   color: #89939d;
+
   font-size: 13px;
   font-weight: 600;
+
   text-transform: uppercase;
+
   letter-spacing: 0.7px;
 }
 
 .swal-form label {
   display: block;
+
   margin-bottom: 18px;
 
   color: #374350;
+
   font-size: 13px;
   font-weight: 600;
 }
@@ -218,22 +267,27 @@ main {
 
 .swal-form .swal2-input {
   height: 45px;
+
   padding: 0 12px;
 }
 
 .swal-form .swal2-textarea {
   min-height: 90px;
+
   padding: 12px;
+
   resize: vertical;
 }
 
 .swal-form .swal2-select {
   height: 45px;
+
   padding: 0 10px;
 }
 
 .swal2-confirm {
   background: #263746 !important;
+
   border-radius: 8px !important;
 }
 
@@ -244,12 +298,13 @@ main {
 
 /* =========================================
    FORMULARIO ANTIGUO
-   Lo dejamos preparado aunque ahora no se use
 ========================================= */
 
 .formulario {
-  background: #ffffff;
   padding: 35px;
+
+  background: #ffffff;
+
   border: 1px solid #e1e5e8;
   border-radius: 14px;
 }
@@ -261,6 +316,7 @@ main {
 .formulario label {
   display: flex;
   flex-direction: column;
+
   gap: 7px;
 
   margin-bottom: 17px;
@@ -273,6 +329,7 @@ main {
 .formulario select,
 .formulario textarea {
   width: 100%;
+
   padding: 11px;
 
   border: 1px solid #cdd3d8;
@@ -283,16 +340,15 @@ main {
 
 .formulario textarea {
   min-height: 90px;
+
   resize: vertical;
 }
 
 .encabezado-formulario {
-  text-align: center;
   margin-bottom: 30px;
+
+  text-align: center;
 }
-
-
-/* LOGO DEL FORMULARIO */
 
 .logo-planilla {
   display: block;
@@ -301,9 +357,9 @@ main {
   max-width: 130px !important;
   height: auto !important;
 
-  object-fit: contain;
-
   margin: 0 auto 15px;
+
+  object-fit: contain;
 }
 
 
@@ -317,22 +373,26 @@ main {
 
 .zona-preview > h2 {
   width: min(794px, 100%);
+
   margin: 0 auto 20px;
 
   font-size: 20px;
+
   color: #25313c;
 }
 
 
 /* =========================================
-   HOJA A4
+   HOJA
 ========================================= */
 
 .hoja-planilla {
   width: min(794px, 100%);
-  min-height: 1123px;
+
+  min-height: auto;
 
   margin: 0 auto 45px;
+
   padding: 45px 50px;
 
   background: #ffffff;
@@ -343,16 +403,14 @@ main {
 
 
 /* =========================================
-   CABECERA DE LA PLANILLA
+   CABECERA DOCUMENTO
 ========================================= */
 
 .cabecera-documento {
-  text-align: center;
   margin-bottom: 22px;
+
+  text-align: center;
 }
-
-
-/* LOGO DENTRO DEL DOCUMENTO */
 
 .logo-documento {
   display: block;
@@ -361,19 +419,24 @@ main {
   max-width: 110px !important;
   height: auto !important;
 
-  object-fit: contain;
-
   margin: 0 auto 8px;
+
+  object-fit: contain;
 }
 
 .texto-cabecera {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 9px;
   line-height: 1.4;
 }
 
 .texto-cabecera strong {
   display: block;
+
   margin-top: 8px;
 
   font-size: 11px;
@@ -381,14 +444,19 @@ main {
 
 
 /* =========================================
-   TABLA DE LA PLANILLA
+   TABLA PLANILLA
 ========================================= */
 
 .titulo-seccion-planilla {
   margin-top: 9px;
+
   padding: 4px 5px;
 
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 9px;
   font-weight: 700;
 
@@ -397,7 +465,9 @@ main {
 
 .fila-planilla {
   display: grid;
-  grid-template-columns: 55% 45%;
+
+  grid-template-columns:
+    55% 45%;
 }
 
 .celda-planilla {
@@ -405,20 +475,25 @@ main {
 
   padding: 3px 5px;
 
-  border-left: 1px solid #777;
-  border-bottom: 1px solid #777;
-
   display: flex;
   align-items: center;
 
-  font-family: Arial, Helvetica, sans-serif;
+  border-left: 1px solid #777;
+  border-bottom: 1px solid #777;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 8px;
   line-height: 1.2;
 
   overflow-wrap: anywhere;
 }
 
-.fila-planilla .celda-planilla:last-child {
+.fila-planilla
+  .celda-planilla:last-child {
   border-right: 1px solid #777;
 }
 
@@ -428,6 +503,8 @@ main {
 
 .valor-celda {
   font-weight: 400;
+
+  white-space: pre-wrap;
 }
 
 
@@ -436,17 +513,21 @@ main {
 ========================================= */
 
 .segunda-hoja {
-  min-height: 1123px;
+  min-height: auto;
 }
 
 .campo-grande-planilla {
-  min-height: 130px;
+  min-height: 180px;
 
   padding: 10px;
 
   border: 1px solid #777;
 
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 9px;
   line-height: 1.4;
 
@@ -454,143 +535,185 @@ main {
 }
 
 .campo-grafico-planilla {
-  min-height: 480px;
+  min-height: 500px;
 
   margin-top: 5px;
+
   padding: 15px;
 
   border: 1px solid #777;
 
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 9px;
+  line-height: 1.4;
 
   white-space: pre-wrap;
 }
 
 
 /* =========================================
-   HISTORIAL
-========================================= */
-
-.historial {
-  width: min(850px, 100%);
-  margin: 0 auto;
-
-  background: #ffffff;
-  border: 1px solid #e2e6e9;
-  border-radius: 14px;
-
-  padding: 35px;
-}
-
-.historial h2 {
-  margin-top: 0;
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 700px) {
-
-  .header {
-    padding: 20px;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header nav {
-    width: 100%;
-  }
-
-  .header nav button {
-    flex: 1;
-  }
-
-  main {
-    width: min(100% - 24px, 1100px);
-    padding-top: 25px;
-  }
-
-  .inicio-asistente {
-    padding: 35px 22px;
-  }
-
-  .hoja-planilla {
-    padding: 25px 15px;
-  }
-
-  .fila-planilla {
-    grid-template-columns: 52% 48%;
-  }
-
-  .celda-planilla {
-    font-size: 7px;
-  }
-
-  .logo-asistente {
-    width: 110px !important;
-    max-width: 110px !important;
-  }
-
-  .logo-documento {
-    width: 90px !important;
-    max-width: 90px !important;
-  }
-
-}
-
-.info-asistente {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  margin: -15px 0 28px;
-
-  color: #8a949e;
-  font-size: 13px;
-}
-/* =========================================
-   GUARDAR PLANILLA
+   ACCIONES
 ========================================= */
 
 .acciones-planilla {
   width: min(794px, 100%);
+
   margin: 25px auto;
 
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
   flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+.acciones-planilla button,
+.acciones-observacion button {
+  padding: 9px 14px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .btn-guardar {
+  padding: 13px 22px;
+
   border: none;
+  border-radius: 8px;
+
   background: #263746;
   color: white;
-
-  padding: 13px 22px;
-  border-radius: 8px;
 
   font-weight: 600;
 }
 
+.btn-secundario {
+  border: 1px solid #ccd3d9;
+
+  background: white;
+  color: #344050;
+}
+
+.btn-editar {
+  border: 1px solid #263746;
+
+  background: #263746;
+  color: white;
+}
+
+.btn-pdf {
+  border: 1px solid #40566b;
+
+  background: #40566b;
+  color: white;
+}
+
+.btn-eliminar {
+  border: 1px solid #e5b7b3;
+
+  background: white;
+  color: #b42318;
+}
+
+
+/* =========================================
+   EDICIÓN
+========================================= */
+
 .modo-edicion {
   width: min(620px, 100%);
+
   margin: 0 auto 15px;
 
   padding: 12px 18px;
 
   background: #fff8e6;
+
   border: 1px solid #ead7a2;
   border-radius: 8px;
 
   text-align: center;
+
   font-size: 14px;
   font-weight: 600;
+}
+
+.barra-edicion {
+  width: min(794px, 100%);
+
+  margin: 0 auto 20px;
+
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  background: white;
+
+  border: 1px solid #dce2e7;
+  border-radius: 12px;
+}
+
+.barra-edicion
+  > div:first-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.barra-edicion span {
+  color: #71808d;
+
+  font-size: 13px;
+}
+
+.barra-edicion-acciones {
+  display: flex;
+
+  gap: 8px;
+}
+
+.campo-editable {
+  position: relative;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.campo-editable:hover {
+  background: #eef4f8;
+
+  box-shadow:
+    inset 0 0 0 1px #7891a6;
+}
+
+.campo-vacio {
+  color: #9aa5ae;
+
+  font-style: italic;
+}
+
+.ayuda-edicion {
+  margin: -5px auto 20px;
+
+  text-align: center;
+
+  color: #71808d;
+
+  font-size: 13px;
 }
 
 
@@ -600,6 +723,7 @@ main {
 
 .historial {
   width: min(850px, 100%);
+
   margin: 0 auto;
 }
 
@@ -613,15 +737,18 @@ main {
 
 .historial-titulo p {
   margin: 0;
+
   color: #7a8490;
 }
 
 .historial-vacio {
+  padding: 50px 25px;
+
   background: white;
+
   border: 1px solid #e1e5e8;
   border-radius: 14px;
 
-  padding: 50px 25px;
   text-align: center;
 }
 
@@ -636,30 +763,34 @@ main {
 .lista-observaciones {
   display: flex;
   flex-direction: column;
+
   gap: 14px;
 }
 
 .observacion-card {
-  background: white;
-
-  border: 1px solid #e1e5e8;
-  border-radius: 12px;
-
   padding: 20px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 25px;
+
+  background: white;
+
+  border: 1px solid #e1e5e8;
+  border-radius: 12px;
 }
 
 .observacion-info h3 {
   margin: 6px 0;
+
   font-size: 18px;
 }
 
 .observacion-info p {
   margin: 0 0 5px;
+
   color: #687481;
 }
 
@@ -668,410 +799,262 @@ main {
 }
 
 .observacion-fecha {
+  color: #7b8794;
+
   font-size: 12px;
   font-weight: 700;
-  color: #7b8794;
 }
 
 .acciones-observacion {
   display: flex;
-  gap: 7px;
   flex-wrap: wrap;
+
+  gap: 7px;
 }
 
-.acciones-observacion button,
-.acciones-planilla button {
-  border-radius: 7px;
-  padding: 9px 14px;
-  font-size: 13px;
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.buscador-observaciones {
+  width: min(850px, 100%);
+
+  margin: 0 auto 25px;
+
+  padding: 15px;
+
+  display: flex;
+
+  gap: 8px;
+
+  background: white;
+
+  border: 1px solid #e1e5e8;
+  border-radius: 12px;
+}
+
+.buscador-observaciones input {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 11px 13px;
+
+  border: 1px solid #ccd3d9;
+  border-radius: 8px;
+
+  outline: none;
+}
+
+.buscador-observaciones input:focus {
+  border-color: #62778a;
+}
+
+.buscador-observaciones button {
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #263746;
+  color: white;
+
   font-weight: 600;
 }
 
-.btn-secundario {
-  background: white;
-  color: #344050;
-  border: 1px solid #ccd3d9;
+.estado-carga {
+  padding: 50px;
+
+  text-align: center;
+
+  color: #7b8794;
 }
 
-.btn-editar {
-  background: #263746;
-  color: white;
-  border: 1px solid #263746;
-}
 
-.btn-eliminar {
-  background: white;
-  color: #b42318;
-  border: 1px solid #e5b7b3;
-}
+/* =========================================
+   RESPONSIVE
+========================================= */
 
-@media (max-width: 650px) {
-  .observacion-card {
-    align-items: stretch;
+@media (max-width: 700px) {
+
+  .header {
+    padding: 20px;
+
     flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .header nav {
+    width: 100%;
+  }
+
+  .header nav button {
+    flex: 1;
+  }
+
+  main {
+    width: min(
+      100% - 24px,
+      1100px
+    );
+
+    padding-top: 25px;
+  }
+
+  .inicio-asistente {
+    padding: 35px 22px;
+  }
+
+  .logo-asistente {
+    width: 110px !important;
+    max-width: 110px !important;
+  }
+
+  .hoja-planilla {
+    padding: 25px 15px;
+  }
+
+  .fila-planilla {
+    grid-template-columns:
+      52% 48%;
+  }
+
+  .celda-planilla {
+    font-size: 7px;
+  }
+
+  .logo-documento {
+    width: 90px !important;
+    max-width: 90px !important;
+  }
+
+  .observacion-card {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .acciones-observacion {
+    width: 100%;
   }
 
   .acciones-observacion button {
     flex: 1;
   }
+
+  .buscador-observaciones {
+    flex-direction: column;
+  }
+
+  .buscador-observaciones button {
+    width: 100%;
+  }
+
+  .barra-edicion {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .barra-edicion-acciones {
+    width: 100%;
+  }
+
+  .barra-edicion-acciones button {
+    flex: 1;
+  }
+
+  .acciones-planilla {
+    justify-content: stretch;
+  }
+
+  .acciones-planilla button {
+    flex: 1;
+  }
+
 }
 
-/* =========================================================
-   IMPRESION / GUARDAR COMO PDF
-   2 PAGINAS A4
-   ========================================================= */
+
+/* =========================================
+   IMPRESIÓN TRADICIONAL
+   Solo por si algún día usa Ctrl + P
+   El botón Descargar PDF ya NO depende de esto.
+========================================= */
 
 @page {
   size: A4 portrait;
+
   margin: 0;
 }
 
 @media print {
 
-  /* -----------------------------------------
-     DOCUMENTO GENERAL
-     ----------------------------------------- */
-
   html,
   body {
-    width: 210mm !important;
     margin: 0 !important;
     padding: 0 !important;
 
-    background: #ffffff !important;
-
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    background: white !important;
   }
 
-  body {
-    min-width: 0 !important;
-  }
-
-  .app {
-    width: 210mm !important;
-    min-height: 0 !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    background: #ffffff !important;
-  }
-
-
-  /* -----------------------------------------
-     OCULTAR TODO LO QUE NO VA EN EL PDF
-     ----------------------------------------- */
-
+  .no-imprimir,
   .header,
   .zona-preview > h2,
   .acciones-planilla,
-  .acciones-observacion,
-  .modo-edicion,
+  .barra-edicion,
   .inicio-asistente,
-  .info-asistente,
   .historial,
-  .formulario,
-  .no-imprimir {
+  .buscador-observaciones {
     display: none !important;
   }
 
-
-  /* -----------------------------------------
-     CONTENEDORES
-     ----------------------------------------- */
-
-  main {
-    display: block !important;
-
-    width: 210mm !important;
-    max-width: none !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
+  main,
   .zona-preview {
-    display: block !important;
-
-    width: 210mm !important;
-    max-width: none !important;
+    width: 100% !important;
 
     margin: 0 !important;
     padding: 0 !important;
-
-    background: #ffffff !important;
   }
-
-
-  /* -----------------------------------------
-     CADA .hoja-planilla = EXACTAMENTE 1 A4
-     ----------------------------------------- */
 
   .hoja-planilla {
-    display: block !important;
-
-    box-sizing: border-box !important;
-
     width: 210mm !important;
-    height: 297mm !important;
-
-    min-width: 210mm !important;
-    max-width: 210mm !important;
 
     min-height: 297mm !important;
-    max-height: 297mm !important;
 
     margin: 0 !important;
 
-    /*
-      Dejamos espacio suficiente para imprimir
-      pero comprimimos la planilla para que
-      la primera hoja entre completa.
-    */
-    padding: 8mm 11mm !important;
-
-    background: #ffffff !important;
+    padding: 10mm !important;
 
     border: none !important;
+
     box-shadow: none !important;
 
-    overflow: hidden !important;
+    page-break-after: always;
 
-    page-break-before: auto !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid-page !important;
-
-    page-break-after: always !important;
-    break-after: page !important;
+    break-after: page;
   }
 
-
-  /* La segunda hoja no genera una tercera */
   .hoja-planilla:last-child {
-    page-break-after: auto !important;
-    break-after: auto !important;
+    page-break-after: auto;
+
+    break-after: auto;
   }
 
-
-  /* -----------------------------------------
-     CABECERA
-     ----------------------------------------- */
-
-  .cabecera-documento {
-    margin: 0 0 3mm 0 !important;
-    padding: 0 !important;
-
-    text-align: center !important;
-  }
-
-  .logo-documento {
-    display: block !important;
-
-    width: 68px !important;
-    max-width: 68px !important;
-    height: auto !important;
-
-    margin: 0 auto 1.5mm !important;
-
-    object-fit: contain !important;
-  }
-
-  .texto-cabecera {
-    margin: 0 !important;
-    padding: 0 !important;
-
-    font-family: Arial, Helvetica, sans-serif !important;
-
-    font-size: 7px !important;
-    line-height: 1.1 !important;
-  }
-
-  .texto-cabecera strong {
-    display: block !important;
-
-    margin: 1.5mm 0 0 !important;
-
-    font-size: 8px !important;
-    line-height: 1.1 !important;
-  }
-
-
-  /* -----------------------------------------
-     TITULOS DE SECCION
-     ----------------------------------------- */
-
-  .titulo-seccion-planilla {
-    box-sizing: border-box !important;
-
-    margin: 1.8mm 0 0 !important;
-    padding: 0.8mm 1mm !important;
-
-    font-family: Arial, Helvetica, sans-serif !important;
-
-    font-size: 7px !important;
-    font-weight: 700 !important;
-    line-height: 1 !important;
-
-    border-bottom: 0.25mm solid #555 !important;
-
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-
-  /* -----------------------------------------
-     FILAS
-     ----------------------------------------- */
-
-  .fila-planilla {
-    display: grid !important;
-
-    grid-template-columns: 55% 45% !important;
-
-    width: 100% !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    min-height: 0 !important;
-    height: auto !important;
-
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-
-  /* -----------------------------------------
-     CELDAS
-     ----------------------------------------- */
-
-  .celda-planilla {
-    box-sizing: border-box !important;
-
-    min-height: 0 !important;
-    height: auto !important;
-
-    margin: 0 !important;
-
-    padding: 0.65mm 1mm !important;
-
-    border-left: 0.25mm solid #777 !important;
-    border-bottom: 0.25mm solid #777 !important;
-
-    display: flex !important;
-    align-items: center !important;
-
-    font-family: Arial, Helvetica, sans-serif !important;
-
-    font-size: 6.3px !important;
-    line-height: 1.05 !important;
-
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
-
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .fila-planilla .celda-planilla:last-child {
-    border-right: 0.25mm solid #777 !important;
-  }
-
-  .titulo-celda {
-    font-weight: 600 !important;
-  }
-
-  .valor-celda {
-    font-weight: 400 !important;
-  }
-
-
-  /* -----------------------------------------
-     SEGUNDA HOJA
-     ----------------------------------------- */
-
-  .segunda-hoja {
-    width: 210mm !important;
-    height: 297mm !important;
-
-    min-height: 297mm !important;
-    max-height: 297mm !important;
-
-    margin: 0 !important;
-
-    padding: 8mm 11mm !important;
-
-    page-break-before: auto !important;
-    break-before: auto !important;
-
-    page-break-after: auto !important;
-    break-after: auto !important;
-
-    overflow: hidden !important;
-  }
-
-
-  /* -----------------------------------------
-     OTROS DATOS
-     ----------------------------------------- */
-
-  .campo-grande-planilla {
-    box-sizing: border-box !important;
-
-    width: 100% !important;
-
-    min-height: 55mm !important;
-    height: 55mm !important;
-    max-height: 55mm !important;
-
-    margin: 0 !important;
-    padding: 2mm !important;
-
-    border: 0.25mm solid #777 !important;
-
-    font-family: Arial, Helvetica, sans-serif !important;
-
-    font-size: 7px !important;
-    line-height: 1.15 !important;
-
-    white-space: pre-wrap !important;
-
-    overflow: hidden !important;
-
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-
-  /* -----------------------------------------
-     PLANIFICACION GRAFICA
-     ----------------------------------------- */
-
-  .campo-grafico-planilla {
-    box-sizing: border-box !important;
-
-    width: 100% !important;
-
-    min-height: 115mm !important;
-    height: 115mm !important;
-    max-height: 115mm !important;
-
-    margin: 1mm 0 0 !important;
-    padding: 2mm !important;
-
-    border: 0.25mm solid #777 !important;
-
-    font-family: Arial, Helvetica, sans-serif !important;
-
-    font-size: 7px !important;
-    line-height: 1.15 !important;
-
-    white-space: pre-wrap !important;
-
-    overflow: hidden !important;
-
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
+}
+
+/* =========================================
+   RESPUESTAS MÁS OSCURAS
+========================================= */
+
+.valor-celda {
+  color: #111111 !important;
+  font-weight: 600 !important;
+}
+
+.campo-grande-planilla,
+.campo-grafico-planilla {
+  color: #111111 !important;
+  font-weight: 500 !important;
 }
