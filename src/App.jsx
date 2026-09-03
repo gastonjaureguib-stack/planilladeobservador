@@ -14,6 +14,11 @@ import {
   buscarObservaciones,
 } from "./services/observacionesService";
 
+import {
+  descargarPDF,
+  compartirPDF,
+} from "./utils/pdfService";
+
 const observacionInicial = {
   nombreObservador: "",
   fechaObservacion: "",
@@ -62,53 +67,77 @@ const observacionInicial = {
   planificacionGrafica: "",
 };
 
-const BORRADOR_KEY = "borrador_observacion";
+const BORRADOR_KEY =
+  "borrador_observacion";
 
 function App() {
-  const [vista, setVista] = useState("nueva");
+  const [vista, setVista] =
+    useState("nueva");
 
-  const [formData, setFormData] = useState(() => {
-    try {
-      const borrador = localStorage.getItem(BORRADOR_KEY);
+  const [formData, setFormData] =
+    useState(() => {
+      try {
+        const borrador =
+          localStorage.getItem(
+            BORRADOR_KEY
+          );
 
-      return borrador
-        ? {
-            ...observacionInicial,
-            ...JSON.parse(borrador),
-          }
-        : { ...observacionInicial };
-    } catch {
-      return { ...observacionInicial };
-    }
-  });
+        return borrador
+          ? {
+              ...observacionInicial,
+              ...JSON.parse(borrador),
+            }
+          : {
+              ...observacionInicial,
+            };
+      } catch {
+        return {
+          ...observacionInicial,
+        };
+      }
+    });
 
-  const [observaciones, setObservaciones] = useState([]);
+  const [observaciones, setObservaciones] =
+    useState([]);
 
-  const [observacionEditando, setObservacionEditando] =
-    useState(null);
+  const [
+    observacionEditando,
+    setObservacionEditando,
+  ] = useState(null);
 
-  const [observacionSeleccionada, setObservacionSeleccionada] =
-    useState(null);
+  const [
+    observacionSeleccionada,
+    setObservacionSeleccionada,
+  ] = useState(null);
 
-  const [nombrePlanillaEditando, setNombrePlanillaEditando] =
+  const [
+    nombrePlanillaEditando,
+    setNombrePlanillaEditando,
+  ] = useState("");
+
+  const [busqueda, setBusqueda] =
     useState("");
 
-  const [busqueda, setBusqueda] = useState("");
+  const [cargando, setCargando] =
+    useState(true);
 
-  const [cargando, setCargando] = useState(true);
-
-  // =====================================================
-  // BORRADOR DE SEGURIDAD
-  // =====================================================
+  // ==========================================
+  // BORRADOR
+  // ==========================================
 
   useEffect(() => {
-    if (vista !== "nueva" && vista !== "editar") {
+    if (
+      vista !== "nueva" &&
+      vista !== "editar"
+    ) {
       return;
     }
 
-    const hayDatos = Object.values(formData).some(
-      (valor) => String(valor || "").trim() !== ""
-    );
+    const hayDatos =
+      Object.values(formData).some(
+        (valor) =>
+          String(valor || "").trim() !== ""
+      );
 
     if (hayDatos) {
       localStorage.setItem(
@@ -116,523 +145,783 @@ function App() {
         JSON.stringify(formData)
       );
     } else {
-      localStorage.removeItem(BORRADOR_KEY);
+      localStorage.removeItem(
+        BORRADOR_KEY
+      );
     }
   }, [formData, vista]);
 
-  // =====================================================
+  // ==========================================
   // SUPABASE
-  // =====================================================
+  // ==========================================
 
-  const cargarObservaciones = async () => {
-    try {
-      setCargando(true);
+  const cargarObservaciones =
+    async () => {
+      try {
+        setCargando(true);
 
-      const data = await obtenerObservaciones();
+        const data =
+          await obtenerObservaciones();
 
-      setObservaciones(data || []);
+        setObservaciones(
+          data || []
+        );
 
-      return data || [];
-    } catch (error) {
-      console.error("Error cargando observaciones:", error);
+        return data || [];
+      } catch (error) {
+        console.error(
+          "Error cargando observaciones:",
+          error
+        );
 
-      await Swal.fire({
-        icon: "error",
-        title: "No se pudieron cargar las planillas",
-        text:
-          error?.message ||
-          "No se pudo conectar con Supabase.",
-      });
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudieron cargar las planillas",
+          text:
+            error?.message ||
+            "No se pudo conectar con Supabase.",
+        });
 
-      return [];
-    } finally {
-      setCargando(false);
-    }
-  };
+        return [];
+      } finally {
+        setCargando(false);
+      }
+    };
 
   useEffect(() => {
     cargarObservaciones();
   }, []);
 
-  // =====================================================
+  // ==========================================
   // NUEVA
-  // =====================================================
+  // ==========================================
 
-  const nuevaObservacion = async () => {
-    const borradorGuardado =
-      localStorage.getItem(BORRADOR_KEY);
+  const nuevaObservacion =
+    async () => {
+      const borradorGuardado =
+        localStorage.getItem(
+          BORRADOR_KEY
+        );
 
-    if (borradorGuardado) {
-      let borrador = null;
+      if (borradorGuardado) {
+        let borrador = null;
 
-      try {
-        borrador = JSON.parse(borradorGuardado);
-      } catch {
-        borrador = null;
+        try {
+          borrador =
+            JSON.parse(
+              borradorGuardado
+            );
+        } catch {
+          borrador = null;
+        }
+
+        if (borrador) {
+          const resultado =
+            await Swal.fire({
+              icon: "question",
+              title:
+                "Hay una planilla sin terminar",
+              text:
+                "¿Querés continuarla o empezar una nueva?",
+              showDenyButton: true,
+              showCancelButton: true,
+              confirmButtonText:
+                "Continuar",
+              denyButtonText:
+                "Empezar nueva",
+              cancelButtonText:
+                "Cancelar",
+            });
+
+          if (
+            resultado.isConfirmed
+          ) {
+            setFormData({
+              ...observacionInicial,
+              ...borrador,
+            });
+
+            setVista("nueva");
+
+            setObservacionEditando(
+              null
+            );
+
+            setObservacionSeleccionada(
+              null
+            );
+
+            return;
+          }
+
+          if (!resultado.isDenied) {
+            return;
+          }
+        }
       }
 
-      if (borrador) {
-        const resultado = await Swal.fire({
-          icon: "question",
-          title: "Hay una planilla sin terminar",
-          text: "¿Querés continuarla o empezar una nueva?",
-          showDenyButton: true,
-          showCancelButton: true,
-          confirmButtonText: "Continuar",
-          denyButtonText: "Empezar nueva",
-          cancelButtonText: "Cancelar",
-        });
+      localStorage.removeItem(
+        BORRADOR_KEY
+      );
 
-        if (resultado.isConfirmed) {
-          setFormData({
-            ...observacionInicial,
-            ...borrador,
-          });
-
-          setVista("nueva");
-          setObservacionEditando(null);
-          setObservacionSeleccionada(null);
-
-          return;
-        }
-
-        if (!resultado.isDenied) {
-          return;
-        }
-      }
-    }
-
-    localStorage.removeItem(BORRADOR_KEY);
-
-    setFormData({
-      ...observacionInicial,
-    });
-
-    setObservacionEditando(null);
-    setObservacionSeleccionada(null);
-    setNombrePlanillaEditando("");
-
-    setVista("nueva");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // =====================================================
-  // GUARDAR NUEVA PLANILLA
-  // =====================================================
-
-  const finalizarObservacion = async (datosFinales) => {
-    setFormData(datosFinales);
-
-    localStorage.setItem(
-      BORRADOR_KEY,
-      JSON.stringify(datosFinales)
-    );
-
-    const resultadoNombre = await Swal.fire({
-      title: "Guardar planilla",
-
-      text:
-        "Poné un nombre para encontrarla fácilmente después.",
-
-      input: "text",
-
-      inputValue:
-        datosFinales.club || "",
-
-      inputPlaceholder:
-        "Ej: Independiente - Categoría 2017",
-
-      showCancelButton: true,
-
-      confirmButtonText: "Guardar planilla",
-
-      cancelButtonText: "Volver",
-
-      inputValidator: (value) => {
-        if (!value?.trim()) {
-          return "Escribí un nombre para la planilla.";
-        }
-      },
-    });
-
-    if (!resultadoNombre.isConfirmed) {
-      return;
-    }
-
-    const nombrePlanilla =
-      resultadoNombre.value.trim();
-
-    try {
-      Swal.fire({
-        title: "Guardando planilla...",
-        text: "No cierres esta ventana.",
-
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-
-        didOpen: () => {
-          Swal.showLoading();
-        },
+      setFormData({
+        ...observacionInicial,
       });
 
-      const guardada = await crearObservacion(
-        nombrePlanilla,
+      setObservacionEditando(null);
+      setObservacionSeleccionada(null);
+
+      setNombrePlanillaEditando(
+        ""
+      );
+
+      setVista("nueva");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
+
+  // ==========================================
+  // GUARDAR NUEVA
+  // ==========================================
+
+  const finalizarObservacion =
+    async (datosFinales) => {
+      setFormData(
         datosFinales
       );
 
-      if (!guardada?.id) {
-        throw new Error(
-          "Supabase no confirmó el guardado."
-        );
-      }
-
-      const actualizadas =
-        await obtenerObservaciones();
-
-      setObservaciones(actualizadas || []);
-
-      localStorage.removeItem(BORRADOR_KEY);
-
-      setFormData({
-        ...observacionInicial,
-      });
-
-      setObservacionEditando(null);
-      setObservacionSeleccionada(null);
-      setNombrePlanillaEditando("");
-
-      setVista("historial");
-
-      await Swal.fire({
-        icon: "success",
-        title: "Planilla guardada",
-        text: `"${nombrePlanilla}" quedó guardada correctamente.`,
-        confirmButtonText: "Aceptar",
-      });
-    } catch (error) {
-      console.error("Error guardando:", error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "No se pudo guardar",
-        html: `
-          <p>La información no se perdió.</p>
-          <p>Quedó guardada como borrador en este dispositivo.</p>
-          <p style="font-size:12px;margin-top:12px">
-            ${error?.message || "Error desconocido"}
-          </p>
-        `,
-      });
-    }
-  };
-
-  // =====================================================
-  // SUPABASE → FORM DATA
-  // =====================================================
-
-  const obtenerDatosFormulario = (observacion) => ({
-    ...observacionInicial,
-    ...(observacion?.datos || {}),
-  });
-
-  // =====================================================
-  // HISTORIAL
-  // =====================================================
-
-  const abrirHistorial = async () => {
-    await cargarObservaciones();
-
-    setVista("historial");
-  };
-
-  // =====================================================
-  // VER
-  // =====================================================
-
-  const verObservacion = (observacion) => {
-    setObservacionSeleccionada(observacion);
-
-    setFormData(
-      obtenerDatosFormulario(observacion)
-    );
-
-    setNombrePlanillaEditando(
-      observacion.nombre_planilla || ""
-    );
-
-    setObservacionEditando(null);
-
-    setVista("ver");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // =====================================================
-  // EDITAR
-  // =====================================================
-
-  const editarObservacion = (observacion) => {
-    const datos =
-      obtenerDatosFormulario(observacion);
-
-    setObservacionSeleccionada(observacion);
-
-    setFormData(datos);
-
-    setObservacionEditando(
-      observacion.id
-    );
-
-    setNombrePlanillaEditando(
-      observacion.nombre_planilla || ""
-    );
-
-    localStorage.setItem(
-      BORRADOR_KEY,
-      JSON.stringify(datos)
-    );
-
-    setVista("editar");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // =====================================================
-  // GUARDAR EDICIÓN
-  // =====================================================
-
-  const guardarEdicionDirecta = async () => {
-    if (!observacionEditando) {
-      return;
-    }
-
-    try {
-      Swal.fire({
-        title: "Guardando cambios...",
-
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      const actualizada =
-        await actualizarObservacion(
-          observacionEditando,
-          nombrePlanillaEditando,
-          formData
-        );
-
-      if (!actualizada?.id) {
-        throw new Error(
-          "Supabase no confirmó la actualización."
-        );
-      }
-
-      const actualizadas =
-        await obtenerObservaciones();
-
-      setObservaciones(actualizadas || []);
-
-      localStorage.removeItem(BORRADOR_KEY);
-
-      setFormData({
-        ...observacionInicial,
-      });
-
-      setObservacionEditando(null);
-      setObservacionSeleccionada(null);
-      setNombrePlanillaEditando("");
-
-      setVista("historial");
-
-      await Swal.fire({
-        icon: "success",
-        title: "Cambios guardados",
-        text: "La planilla fue actualizada correctamente.",
-      });
-    } catch (error) {
-      console.error(
-        "Error actualizando:",
-        error
+      localStorage.setItem(
+        BORRADOR_KEY,
+        JSON.stringify(
+          datosFinales
+        )
       );
 
-      await Swal.fire({
-        icon: "error",
-        title: "No se pudieron guardar los cambios",
-        text:
-          error?.message ||
-          "La edición quedó guardada como borrador.",
-      });
-    }
-  };
+      const resultadoNombre =
+        await Swal.fire({
+          title:
+            "Guardar planilla",
 
-  // =====================================================
-  // CANCELAR EDICIÓN
-  // =====================================================
+          text:
+            "Poné un nombre para encontrarla fácilmente después.",
 
-  const cancelarEdicion = async () => {
-    const resultado = await Swal.fire({
-      icon: "question",
+          input: "text",
 
-      title: "¿Cancelar edición?",
+          inputValue:
+            datosFinales.club || "",
 
-      text:
-        "Los cambios sin guardar se perderán.",
+          inputPlaceholder:
+            "Ej: Independiente - Categoría 2017",
 
-      showCancelButton: true,
+          showCancelButton: true,
 
-      confirmButtonText: "Sí, cancelar",
+          confirmButtonText:
+            "Guardar planilla",
 
-      cancelButtonText: "Seguir editando",
-    });
+          cancelButtonText:
+            "Volver",
 
-    if (!resultado.isConfirmed) {
-      return;
-    }
+          inputValidator:
+            (value) => {
+              if (!value?.trim()) {
+                return "Escribí un nombre para la planilla.";
+              }
+            },
+        });
 
-    localStorage.removeItem(BORRADOR_KEY);
+      if (
+        !resultadoNombre.isConfirmed
+      ) {
+        return;
+      }
 
-    setObservacionEditando(null);
-    setObservacionSeleccionada(null);
-    setNombrePlanillaEditando("");
+      const nombrePlanilla =
+        resultadoNombre.value.trim();
 
-    setFormData({
+      try {
+        Swal.fire({
+          title:
+            "Guardando planilla...",
+
+          text:
+            "No cierres esta ventana.",
+
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const guardada =
+          await crearObservacion(
+            nombrePlanilla,
+            datosFinales
+          );
+
+        if (!guardada?.id) {
+          throw new Error(
+            "Supabase no confirmó el guardado."
+          );
+        }
+
+        const actualizadas =
+          await obtenerObservaciones();
+
+        setObservaciones(
+          actualizadas || []
+        );
+
+        localStorage.removeItem(
+          BORRADOR_KEY
+        );
+
+        setFormData({
+          ...observacionInicial,
+        });
+
+        setObservacionEditando(
+          null
+        );
+
+        setObservacionSeleccionada(
+          null
+        );
+
+        setNombrePlanillaEditando(
+          ""
+        );
+
+        setVista("historial");
+
+        await Swal.fire({
+          icon: "success",
+          title:
+            "Planilla guardada",
+          text: `"${nombrePlanilla}" quedó guardada correctamente.`,
+          confirmButtonText:
+            "Aceptar",
+        });
+      } catch (error) {
+        console.error(
+          "Error guardando:",
+          error
+        );
+
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudo guardar",
+
+          html: `
+            <p>La información no se perdió.</p>
+            <p>Quedó guardada como borrador en este dispositivo.</p>
+            <p style="font-size:12px;margin-top:12px">
+              ${
+                error?.message ||
+                "Error desconocido"
+              }
+            </p>
+          `,
+        });
+      }
+    };
+
+  // ==========================================
+  // CONVERTIR DATOS
+  // ==========================================
+
+  const obtenerDatosFormulario =
+    (observacion) => ({
       ...observacionInicial,
+      ...(observacion?.datos ||
+        {}),
     });
 
-    setVista("historial");
-  };
+  // ==========================================
+  // HISTORIAL
+  // ==========================================
 
-  // =====================================================
-  // ELIMINAR
-  // =====================================================
+  const abrirHistorial =
+    async () => {
+      await cargarObservaciones();
 
-  const eliminarObservacion = async (
-    observacion
-  ) => {
-    const resultado = await Swal.fire({
-      icon: "warning",
+      setVista("historial");
+    };
 
-      title: "¿Eliminar planilla?",
+  // ==========================================
+  // VER
+  // ==========================================
 
-      text: `"${observacion.nombre_planilla || "Esta planilla"}" se eliminará definitivamente.`,
+  const verObservacion =
+    (observacion) => {
+      setObservacionSeleccionada(
+        observacion
+      );
 
-      showCancelButton: true,
+      setFormData(
+        obtenerDatosFormulario(
+          observacion
+        )
+      );
 
-      confirmButtonText: "Sí, eliminar",
+      setNombrePlanillaEditando(
+        observacion.nombre_planilla ||
+          ""
+      );
 
-      cancelButtonText: "Cancelar",
+      setObservacionEditando(
+        null
+      );
 
-      confirmButtonColor: "#b42318",
-    });
+      setVista("ver");
 
-    if (!resultado.isConfirmed) {
-      return;
-    }
-
-    try {
-      Swal.fire({
-        title: "Eliminando...",
-
-        allowOutsideClick: false,
-
-        didOpen: () => {
-          Swal.showLoading();
-        },
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
       });
+    };
 
-      await eliminarObservacionDB(
+  // ==========================================
+  // EDITAR
+  // ==========================================
+
+  const editarObservacion =
+    (observacion) => {
+      const datos =
+        obtenerDatosFormulario(
+          observacion
+        );
+
+      setObservacionSeleccionada(
+        observacion
+      );
+
+      setFormData(datos);
+
+      setObservacionEditando(
         observacion.id
       );
 
-      await cargarObservaciones();
+      setNombrePlanillaEditando(
+        observacion.nombre_planilla ||
+          ""
+      );
 
-      await Swal.fire({
-        icon: "success",
-        title: "Planilla eliminada",
+      localStorage.setItem(
+        BORRADOR_KEY,
+        JSON.stringify(datos)
+      );
 
-        timer: 1200,
+      setVista("editar");
 
-        showConfirmButton: false,
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
       });
-    } catch (error) {
-      await Swal.fire({
-        icon: "error",
-        title: "No se pudo eliminar",
-        text: error?.message,
-      });
-    }
-  };
+    };
 
-  // =====================================================
+  // ==========================================
+  // GUARDAR EDICIÓN
+  // ==========================================
+
+  const guardarEdicionDirecta =
+    async () => {
+      if (!observacionEditando) {
+        return;
+      }
+
+      try {
+        Swal.fire({
+          title:
+            "Guardando cambios...",
+
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const actualizada =
+          await actualizarObservacion(
+            observacionEditando,
+            nombrePlanillaEditando,
+            formData
+          );
+
+        if (!actualizada?.id) {
+          throw new Error(
+            "Supabase no confirmó la actualización."
+          );
+        }
+
+        const actualizadas =
+          await obtenerObservaciones();
+
+        setObservaciones(
+          actualizadas || []
+        );
+
+        localStorage.removeItem(
+          BORRADOR_KEY
+        );
+
+        setFormData({
+          ...observacionInicial,
+        });
+
+        setObservacionEditando(
+          null
+        );
+
+        setObservacionSeleccionada(
+          null
+        );
+
+        setNombrePlanillaEditando(
+          ""
+        );
+
+        setVista("historial");
+
+        await Swal.fire({
+          icon: "success",
+          title:
+            "Cambios guardados",
+          text:
+            "La planilla fue actualizada correctamente.",
+        });
+      } catch (error) {
+        console.error(
+          "Error actualizando:",
+          error
+        );
+
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudieron guardar los cambios",
+          text:
+            error?.message ||
+            "La edición quedó guardada como borrador.",
+        });
+      }
+    };
+
+  // ==========================================
+  // CANCELAR EDICIÓN
+  // ==========================================
+
+  const cancelarEdicion =
+    async () => {
+      const resultado =
+        await Swal.fire({
+          icon: "question",
+
+          title:
+            "¿Cancelar edición?",
+
+          text:
+            "Los cambios sin guardar se perderán.",
+
+          showCancelButton: true,
+
+          confirmButtonText:
+            "Sí, cancelar",
+
+          cancelButtonText:
+            "Seguir editando",
+        });
+
+      if (
+        !resultado.isConfirmed
+      ) {
+        return;
+      }
+
+      localStorage.removeItem(
+        BORRADOR_KEY
+      );
+
+      setObservacionEditando(
+        null
+      );
+
+      setObservacionSeleccionada(
+        null
+      );
+
+      setNombrePlanillaEditando(
+        ""
+      );
+
+      setFormData({
+        ...observacionInicial,
+      });
+
+      setVista("historial");
+    };
+
+  // ==========================================
+  // ELIMINAR
+  // ==========================================
+
+  const eliminarObservacion =
+    async (observacion) => {
+      const resultado =
+        await Swal.fire({
+          icon: "warning",
+
+          title:
+            "¿Eliminar planilla?",
+
+          text: `"${observacion.nombre_planilla || "Esta planilla"}" se eliminará definitivamente.`,
+
+          showCancelButton: true,
+
+          confirmButtonText:
+            "Sí, eliminar",
+
+          cancelButtonText:
+            "Cancelar",
+
+          confirmButtonColor:
+            "#b42318",
+        });
+
+      if (
+        !resultado.isConfirmed
+      ) {
+        return;
+      }
+
+      try {
+        Swal.fire({
+          title:
+            "Eliminando...",
+
+          allowOutsideClick: false,
+
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        await eliminarObservacionDB(
+          observacion.id
+        );
+
+        await cargarObservaciones();
+
+        await Swal.fire({
+          icon: "success",
+
+          title:
+            "Planilla eliminada",
+
+          timer: 1200,
+
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudo eliminar",
+          text:
+            error?.message,
+        });
+      }
+    };
+
+  // ==========================================
   // BUSCAR
-  // =====================================================
+  // ==========================================
 
-  const ejecutarBusqueda = async () => {
+  const ejecutarBusqueda =
+    async () => {
+      try {
+        setCargando(true);
+
+        const data =
+          await buscarObservaciones(
+            busqueda
+          );
+
+        setObservaciones(
+          data || []
+        );
+      } catch (error) {
+        await Swal.fire({
+          icon: "error",
+
+          title:
+            "Error al buscar",
+
+          text:
+            error?.message,
+        });
+      } finally {
+        setCargando(false);
+      }
+    };
+
+  const limpiarBusqueda =
+    async () => {
+      setBusqueda("");
+
+      await cargarObservaciones();
+    };
+
+  // ==========================================
+  // DESCARGAR PDF
+  // ==========================================
+
+  const generarPDF = async () => {
     try {
-      setCargando(true);
+      Swal.fire({
+        title:
+          "Generando PDF...",
 
-      const data =
-        await buscarObservaciones(busqueda);
+        text:
+          "Preparando las dos hojas.",
 
-      setObservaciones(data || []);
+        allowOutsideClick: false,
+
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      await descargarPDF(
+        nombrePlanillaEditando ||
+          formData.club ||
+          "planilla-observacion"
+      );
+
+      Swal.close();
     } catch (error) {
+      console.error(error);
+
       await Swal.fire({
         icon: "error",
-        title: "Error al buscar",
-        text: error?.message,
+
+        title:
+          "No se pudo generar el PDF",
+
+        text:
+          error?.message ||
+          "Ocurrió un error al crear el archivo.",
       });
-    } finally {
-      setCargando(false);
     }
   };
 
-  const limpiarBusqueda = async () => {
-    setBusqueda("");
+  // ==========================================
+  // COMPARTIR PDF
+  // ==========================================
 
-    await cargarObservaciones();
-  };
+  const compartirPlanillaPDF =
+    async () => {
+      try {
+        Swal.fire({
+          title:
+            "Preparando PDF...",
 
-  // =====================================================
-  // PDF
-  // =====================================================
+          allowOutsideClick: false,
 
-  const generarPDF = () => {
-    window.print();
-  };
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
-  const imprimirObservacion = (
-    observacion
-  ) => {
-    setObservacionSeleccionada(observacion);
+        await compartirPDF(
+          nombrePlanillaEditando ||
+            formData.club ||
+            "planilla-observacion"
+        );
 
-    setFormData(
-      obtenerDatosFormulario(observacion)
-    );
+        Swal.close();
+      } catch (error) {
+        console.error(error);
 
-    setVista("ver");
+        if (
+          error?.name ===
+          "AbortError"
+        ) {
+          Swal.close();
+          return;
+        }
 
-    setTimeout(() => {
-      window.print();
-    }, 350);
-  };
+        await Swal.fire({
+          icon: "error",
 
-  // =====================================================
+          title:
+            "No se pudo compartir",
+
+          text:
+            error?.message ||
+            "No se pudo preparar el archivo.",
+        });
+      }
+    };
+
+  // ==========================================
+  // PDF DESDE HISTORIAL
+  // ==========================================
+
+  const imprimirObservacion =
+    (observacion) => {
+      const datos =
+        obtenerDatosFormulario(
+          observacion
+        );
+
+      setObservacionSeleccionada(
+        observacion
+      );
+
+      setFormData(datos);
+
+      setNombrePlanillaEditando(
+        observacion.nombre_planilla ||
+          ""
+      );
+
+      setVista("ver");
+
+      setTimeout(async () => {
+        try {
+          await descargarPDF(
+            observacion.nombre_planilla ||
+              observacion.club ||
+              "planilla-observacion"
+          );
+        } catch (error) {
+          console.error(error);
+
+          await Swal.fire({
+            icon: "error",
+
+            title:
+              "No se pudo generar el PDF",
+
+            text:
+              error?.message,
+          });
+        }
+      }, 500);
+    };
+
+  // ==========================================
   // RENDER
-  // =====================================================
+  // ==========================================
 
   return (
     <div className="app">
@@ -640,6 +929,7 @@ function App() {
       <header className="header no-imprimir">
 
         <div>
+
           <h1>
             Observaciones de entrenamiento
           </h1>
@@ -647,6 +937,7 @@ function App() {
           <p>
             Visoría de Licencia C
           </p>
+
         </div>
 
         <nav>
@@ -681,7 +972,9 @@ function App() {
               <AsistenteObservacion
                 formData={formData}
                 setFormData={setFormData}
-                onFinalizar={finalizarObservacion}
+                onFinalizar={
+                  finalizarObservacion
+                }
               />
 
               <div className="acciones-planilla">
@@ -690,7 +983,9 @@ function App() {
                   type="button"
                   className="btn-guardar"
                   onClick={() =>
-                    finalizarObservacion(formData)
+                    finalizarObservacion(
+                      formData
+                    )
                   }
                 >
                   Guardar esta planilla
@@ -718,7 +1013,9 @@ function App() {
               <div>
 
                 <strong>
-                  {nombrePlanillaEditando}
+                  {
+                    nombrePlanillaEditando
+                  }
                 </strong>
 
                 <span>
@@ -732,7 +1029,9 @@ function App() {
                 <button
                   type="button"
                   className="btn-secundario"
-                  onClick={cancelarEdicion}
+                  onClick={
+                    cancelarEdicion
+                  }
                 >
                   Cancelar
                 </button>
@@ -740,7 +1039,9 @@ function App() {
                 <button
                   type="button"
                   className="btn-guardar"
-                  onClick={guardarEdicionDirecta}
+                  onClick={
+                    guardarEdicionDirecta
+                  }
                 >
                   Guardar cambios
                 </button>
@@ -751,7 +1052,9 @@ function App() {
 
             <PlanillaPreview
               formData={formData}
-              setFormData={setFormData}
+              setFormData={
+                setFormData
+              }
               editable={true}
             />
 
@@ -768,15 +1071,21 @@ function App() {
 
               <input
                 type="text"
+
                 placeholder="Buscar por nombre, club, observador, técnico o categoría..."
+
                 value={busqueda}
 
                 onChange={(e) =>
-                  setBusqueda(e.target.value)
+                  setBusqueda(
+                    e.target.value
+                  )
                 }
 
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (
+                    e.key === "Enter"
+                  ) {
                     ejecutarBusqueda();
                   }
                 }}
@@ -784,19 +1093,25 @@ function App() {
 
               <button
                 type="button"
-                onClick={ejecutarBusqueda}
+                onClick={
+                  ejecutarBusqueda
+                }
               >
                 Buscar
               </button>
 
               {busqueda && (
+
                 <button
                   type="button"
                   className="btn-secundario"
-                  onClick={limpiarBusqueda}
+                  onClick={
+                    limpiarBusqueda
+                  }
                 >
                   Limpiar
                 </button>
+
               )}
 
             </section>
@@ -810,11 +1125,21 @@ function App() {
             ) : (
 
               <HistorialObservaciones
-                observaciones={observaciones}
-                onEditar={editarObservacion}
-                onEliminar={eliminarObservacion}
-                onVer={verObservacion}
-                onPDF={imprimirObservacion}
+                observaciones={
+                  observaciones
+                }
+                onEditar={
+                  editarObservacion
+                }
+                onEliminar={
+                  eliminarObservacion
+                }
+                onVer={
+                  verObservacion
+                }
+                onPDF={
+                  imprimirObservacion
+                }
               />
 
             )}
@@ -833,15 +1158,19 @@ function App() {
               <button
                 type="button"
                 className="btn-secundario"
-                onClick={abrirHistorial}
+                onClick={
+                  abrirHistorial
+                }
               >
                 ← Volver
               </button>
 
               {observacionSeleccionada && (
+
                 <button
                   type="button"
                   className="btn-editar"
+
                   onClick={() =>
                     editarObservacion(
                       observacionSeleccionada
@@ -850,6 +1179,7 @@ function App() {
                 >
                   Editar
                 </button>
+
               )}
 
               <button
@@ -857,7 +1187,17 @@ function App() {
                 className="btn-pdf"
                 onClick={generarPDF}
               >
-                Guardar como PDF
+                Descargar PDF
+              </button>
+
+              <button
+                type="button"
+                className="btn-secundario"
+                onClick={
+                  compartirPlanillaPDF
+                }
+              >
+                Compartir PDF
               </button>
 
             </div>
