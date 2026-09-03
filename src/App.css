@@ -540,3 +540,16 @@ main {
   }
 
 }
+
+.info-asistente {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin: -15px 0 28px;
+
+  color: #8a949e;
+  font-size: 13px;
+}
