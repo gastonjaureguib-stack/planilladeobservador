@@ -553,3 +553,165 @@ main {
   color: #8a949e;
   font-size: 13px;
 }
+/* =========================================
+   GUARDAR PLANILLA
+========================================= */
+
+.acciones-planilla {
+  width: min(794px, 100%);
+  margin: 25px auto;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-guardar {
+  border: none;
+  background: #263746;
+  color: white;
+
+  padding: 13px 22px;
+  border-radius: 8px;
+
+  font-weight: 600;
+}
+
+.modo-edicion {
+  width: min(620px, 100%);
+  margin: 0 auto 15px;
+
+  padding: 12px 18px;
+
+  background: #fff8e6;
+  border: 1px solid #ead7a2;
+  border-radius: 8px;
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* =========================================
+   HISTORIAL
+========================================= */
+
+.historial {
+  width: min(850px, 100%);
+  margin: 0 auto;
+}
+
+.historial-titulo {
+  margin-bottom: 25px;
+}
+
+.historial-titulo h2 {
+  margin: 0 0 5px;
+}
+
+.historial-titulo p {
+  margin: 0;
+  color: #7a8490;
+}
+
+.historial-vacio {
+  background: white;
+  border: 1px solid #e1e5e8;
+  border-radius: 14px;
+
+  padding: 50px 25px;
+  text-align: center;
+}
+
+.historial-vacio h3 {
+  margin-top: 0;
+}
+
+.historial-vacio p {
+  color: #7a8490;
+}
+
+.lista-observaciones {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.observacion-card {
+  background: white;
+
+  border: 1px solid #e1e5e8;
+  border-radius: 12px;
+
+  padding: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.observacion-info h3 {
+  margin: 6px 0;
+  font-size: 18px;
+}
+
+.observacion-info p {
+  margin: 0 0 5px;
+  color: #687481;
+}
+
+.observacion-info small {
+  color: #89939d;
+}
+
+.observacion-fecha {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7b8794;
+}
+
+.acciones-observacion {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.acciones-observacion button,
+.acciones-planilla button {
+  border-radius: 7px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-secundario {
+  background: white;
+  color: #344050;
+  border: 1px solid #ccd3d9;
+}
+
+.btn-editar {
+  background: #263746;
+  color: white;
+  border: 1px solid #263746;
+}
+
+.btn-eliminar {
+  background: white;
+  color: #b42318;
+  border: 1px solid #e5b7b3;
+}
+
+@media (max-width: 650px) {
+  .observacion-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .acciones-observacion button {
+    flex: 1;
+  }
+}
