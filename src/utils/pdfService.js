@@ -72,15 +72,38 @@ const crearHojaParaPDF = (
   /*
    * El contenedor queda fuera de pantalla,
    * pero sigue siendo renderizado.
+   *
+   * IMPORTANTE:
+   * usamos position absolute en lugar de fixed
+   * para evitar problemas con el viewport móvil.
    */
-  contenedor.style.position = "fixed";
-  contenedor.style.left = "-10000px";
+
+  contenedor.style.position = "absolute";
+  contenedor.style.left = "0";
   contenedor.style.top = "0";
+
+  contenedor.style.transform =
+    "translateX(-10000px)";
+
+  contenedor.style.transformOrigin =
+    "top left";
 
   contenedor.style.width =
     `${A4_WIDTH_PX}px`;
 
+  contenedor.style.minWidth =
+    `${A4_WIDTH_PX}px`;
+
+  contenedor.style.maxWidth =
+    `${A4_WIDTH_PX}px`;
+
   contenedor.style.height =
+    `${A4_HEIGHT_PX}px`;
+
+  contenedor.style.minHeight =
+    `${A4_HEIGHT_PX}px`;
+
+  contenedor.style.maxHeight =
     `${A4_HEIGHT_PX}px`;
 
   contenedor.style.background =
@@ -95,6 +118,34 @@ const crearHojaParaPDF = (
 
   const hoja =
     hojaOriginal.cloneNode(true);
+
+
+  /*
+   * Clase exclusiva para localizar
+   * esta hoja dentro del clon creado
+   * por html2canvas.
+   */
+
+  hoja.classList.add("modo-pdf");
+
+
+  hoja.style.setProperty(
+    "position",
+    "relative",
+    "important"
+  );
+
+  hoja.style.setProperty(
+    "transform",
+    "none",
+    "important"
+  );
+
+  hoja.style.setProperty(
+    "zoom",
+    "1",
+    "important"
+  );
 
 
   /* =====================================================
@@ -692,7 +743,6 @@ export const crearPDF = async () => {
         await html2canvas(
           hoja,
           {
-            
             scale: 2,
 
             backgroundColor:
@@ -710,8 +760,15 @@ export const crearPDF = async () => {
             height:
               A4_HEIGHT_PX,
 
+            /*
+             * CLAVE PARA CELULAR:
+             * el viewport utilizado por html2canvas
+             * ahora tiene exactamente el ancho
+             * del documento A4.
+             */
+
             windowWidth:
-              1200,
+              A4_WIDTH_PX,
 
             windowHeight:
               A4_HEIGHT_PX,
@@ -720,7 +777,114 @@ export const crearPDF = async () => {
 
             scrollY: 0,
 
+            x: 0,
+
+            y: 0,
+
             removeContainer: true,
+
+
+            /*
+             * html2canvas genera internamente
+             * otro documento clonado.
+             *
+             * Volvemos a forzar allí el tamaño
+             * para impedir que entren estilos
+             * responsive del celular.
+             */
+
+            onclone: (
+              documentoClonado
+            ) => {
+              const hojaClonada =
+                documentoClonado
+                  .querySelector(
+                    ".modo-pdf"
+                  );
+
+              if (!hojaClonada) {
+                return;
+              }
+
+
+              hojaClonada.style.setProperty(
+                "box-sizing",
+                "border-box",
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "position",
+                "relative",
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "width",
+                `${A4_WIDTH_PX}px`,
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "min-width",
+                `${A4_WIDTH_PX}px`,
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "max-width",
+                `${A4_WIDTH_PX}px`,
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "height",
+                `${A4_HEIGHT_PX}px`,
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "min-height",
+                `${A4_HEIGHT_PX}px`,
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "max-height",
+                `${A4_HEIGHT_PX}px`,
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "margin",
+                "0",
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "transform",
+                "none",
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "zoom",
+                "1",
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "background",
+                "#ffffff",
+                "important"
+              );
+
+              hojaClonada.style.setProperty(
+                "overflow",
+                "hidden",
+                "important"
+              );
+            },
           }
         );
 
@@ -740,7 +904,6 @@ export const crearPDF = async () => {
       }
 
 
-      
       pdf.addImage(
         imagen,
         "JPEG",
