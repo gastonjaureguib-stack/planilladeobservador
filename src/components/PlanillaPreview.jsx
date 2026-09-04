@@ -296,7 +296,7 @@ function PlanillaPreview({
 
 
         <Fila
-          titulo="4. FIRMA Y ACLARACIÓN DEL PROFESOR:"
+          titulo="4. Firma y aclaración de presencia por el técnico del club observado:"
           campo="firmaProfesor"
         />
 
