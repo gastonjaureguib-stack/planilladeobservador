@@ -2,7 +2,15 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
 /* =====================================================
-   LIMPIAR NOMBRE DEL ARCHIVO
+   CONSTANTES A4
+===================================================== */
+
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
+
+
+/* =====================================================
+   LIMPIAR NOMBRE
 ===================================================== */
 
 const limpiarNombre = (nombre = "planilla") => {
@@ -14,7 +22,7 @@ const limpiarNombre = (nombre = "planilla") => {
 
 
 /* =====================================================
-   ESPERAR A QUE CARGUEN LAS IMÁGENES
+   ESPERAR IMÁGENES
 ===================================================== */
 
 const esperarImagenes = async (elemento) => {
@@ -38,7 +46,20 @@ const esperarImagenes = async (elemento) => {
 
 
 /* =====================================================
-   CREAR COPIA DE LA HOJA PARA GENERAR EL PDF
+   ESPERAR RENDER DEL NAVEGADOR
+===================================================== */
+
+const esperarRender = () => {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve);
+    });
+  });
+};
+
+
+/* =====================================================
+   CREAR HOJA FIJA A4
 ===================================================== */
 
 const crearHojaParaPDF = (
@@ -48,19 +69,36 @@ const crearHojaParaPDF = (
   const contenedor =
     document.createElement("div");
 
+  /*
+   * El contenedor queda fuera de pantalla,
+   * pero sigue siendo renderizado.
+   */
   contenedor.style.position = "fixed";
   contenedor.style.left = "-10000px";
   contenedor.style.top = "0";
-  contenedor.style.width = "794px";
-  contenedor.style.background = "#ffffff";
-  contenedor.style.zIndex = "-9999";
+
+  contenedor.style.width =
+    `${A4_WIDTH_PX}px`;
+
+  contenedor.style.height =
+    `${A4_HEIGHT_PX}px`;
+
+  contenedor.style.background =
+    "#ffffff";
+
+  contenedor.style.overflow =
+    "hidden";
+
+  contenedor.style.zIndex =
+    "-99999";
+
 
   const hoja =
     hojaOriginal.cloneNode(true);
 
 
   /* =====================================================
-     CONFIGURACIÓN GENERAL DE LA HOJA
+     FORZAR TAMAÑO A4
   ===================================================== */
 
   hoja.style.setProperty(
@@ -71,37 +109,37 @@ const crearHojaParaPDF = (
 
   hoja.style.setProperty(
     "width",
-    "794px",
+    `${A4_WIDTH_PX}px`,
     "important"
   );
 
   hoja.style.setProperty(
     "min-width",
-    "794px",
+    `${A4_WIDTH_PX}px`,
     "important"
   );
 
   hoja.style.setProperty(
     "max-width",
-    "794px",
+    `${A4_WIDTH_PX}px`,
     "important"
   );
 
   hoja.style.setProperty(
     "height",
-    "auto",
+    `${A4_HEIGHT_PX}px`,
     "important"
   );
 
   hoja.style.setProperty(
     "min-height",
-    "0",
+    `${A4_HEIGHT_PX}px`,
     "important"
   );
 
   hoja.style.setProperty(
     "max-height",
-    "none",
+    `${A4_HEIGHT_PX}px`,
     "important"
   );
 
@@ -131,41 +169,37 @@ const crearHojaParaPDF = (
 
   hoja.style.setProperty(
     "overflow",
-    "visible",
+    "hidden",
     "important"
   );
 
 
   /* =====================================================
-     PÁGINA 1
+     HOJA 1
   ===================================================== */
 
   if (indiceHoja === 0) {
     hoja.style.setProperty(
       "padding",
-      "38px 45px",
+      "35px 45px",
       "important"
     );
   }
 
 
   /* =====================================================
-     PÁGINA 2 - ANEXO
-     MENOS ESPACIO ARRIBA
+     HOJA 2
   ===================================================== */
 
   if (indiceHoja === 1) {
     hoja.style.setProperty(
       "padding",
-      "20px 45px 30px",
+      "35px 45px",
       "important"
     );
 
-    hoja.style.setProperty(
-      "min-height",
-      "0",
-      "important"
-    );
+
+    /* ENCABEZADO ANEXO */
 
     const encabezadoAnexo =
       hoja.querySelector(
@@ -174,20 +208,14 @@ const crearHojaParaPDF = (
 
     if (encabezadoAnexo) {
       encabezadoAnexo.style.setProperty(
-        "margin-top",
-        "0",
-        "important"
-      );
-
-      encabezadoAnexo.style.setProperty(
-        "margin-bottom",
-        "6px",
+        "margin",
+        "0 0 8px 0",
         "important"
       );
     }
 
 
-    /* CUADRO DE OBSERVACIONES */
+    /* OBSERVACIONES */
 
     const observaciones =
       hoja.querySelector(
@@ -196,14 +224,32 @@ const crearHojaParaPDF = (
 
     if (observaciones) {
       observaciones.style.setProperty(
-        "min-height",
-        "210px",
+        "box-sizing",
+        "border-box",
+        "important"
+      );
+
+      observaciones.style.setProperty(
+        "width",
+        "100%",
         "important"
       );
 
       observaciones.style.setProperty(
         "height",
-        "210px",
+        "230px",
+        "important"
+      );
+
+      observaciones.style.setProperty(
+        "min-height",
+        "230px",
+        "important"
+      );
+
+      observaciones.style.setProperty(
+        "max-height",
+        "230px",
         "important"
       );
 
@@ -218,10 +264,22 @@ const crearHojaParaPDF = (
         "9px",
         "important"
       );
+
+      observaciones.style.setProperty(
+        "line-height",
+        "1.35",
+        "important"
+      );
+
+      observaciones.style.setProperty(
+        "overflow",
+        "hidden",
+        "important"
+      );
     }
 
 
-    /* FIRMA */
+    /* BLOQUE FIRMA */
 
     const firmaInferior =
       hoja.querySelector(
@@ -231,10 +289,17 @@ const crearHojaParaPDF = (
     if (firmaInferior) {
       firmaInferior.style.setProperty(
         "margin-top",
-        "25px",
+        "30px",
+        "important"
+      );
+
+      firmaInferior.style.setProperty(
+        "margin-bottom",
+        "0",
         "important"
       );
     }
+
 
     const firmaAlumno =
       hoja.querySelector(
@@ -247,7 +312,20 @@ const crearHojaParaPDF = (
         "230px",
         "important"
       );
+
+      firmaAlumno.style.setProperty(
+        "margin-left",
+        "0",
+        "important"
+      );
+
+      firmaAlumno.style.setProperty(
+        "margin-right",
+        "auto",
+        "important"
+      );
     }
+
 
     const firmaJorge =
       hoja.querySelector(
@@ -263,31 +341,25 @@ const crearHojaParaPDF = (
 
       firmaJorge.style.setProperty(
         "width",
-        "120px",
+        "140px",
         "important"
       );
 
       firmaJorge.style.setProperty(
         "max-width",
-        "120px",
+        "140px",
         "important"
       );
 
       firmaJorge.style.setProperty(
         "height",
-        "auto",
+        "70px",
         "important"
       );
 
       firmaJorge.style.setProperty(
         "max-height",
-        "75px",
-        "important"
-      );
-
-      firmaJorge.style.setProperty(
-        "margin",
-        "0 auto 3px",
+        "70px",
         "important"
       );
 
@@ -296,12 +368,18 @@ const crearHojaParaPDF = (
         "contain",
         "important"
       );
+
+      firmaJorge.style.setProperty(
+        "margin",
+        "0 auto 3px",
+        "important"
+      );
     }
   }
 
 
   /* =====================================================
-     CABECERA PÁGINA 1
+     CABECERA
   ===================================================== */
 
   const cabecera =
@@ -312,7 +390,7 @@ const crearHojaParaPDF = (
   if (cabecera) {
     cabecera.style.setProperty(
       "margin-bottom",
-      "18px",
+      "16px",
       "important"
     );
   }
@@ -333,6 +411,12 @@ const crearHojaParaPDF = (
     logo.style.setProperty(
       "max-width",
       "100px",
+      "important"
+    );
+
+    logo.style.setProperty(
+      "height",
+      "auto",
       "important"
     );
   }
@@ -369,7 +453,7 @@ const crearHojaParaPDF = (
     .forEach((titulo) => {
       titulo.style.setProperty(
         "margin-top",
-        "8px",
+        "7px",
         "important"
       );
 
@@ -420,6 +504,12 @@ const crearHojaParaPDF = (
     )
     .forEach((celda) => {
       celda.style.setProperty(
+        "box-sizing",
+        "border-box",
+        "important"
+      );
+
+      celda.style.setProperty(
         "min-height",
         "18px",
         "important"
@@ -455,18 +545,23 @@ const crearHojaParaPDF = (
      VALORES
   ===================================================== */
 
-  const valores =
-    hoja.querySelectorAll(
+  hoja
+    .querySelectorAll(
       ".valor-celda"
-    );
+    )
+    .forEach((valor) => {
+      valor.style.setProperty(
+        "font-weight",
+        "600",
+        "important"
+      );
 
-  valores.forEach((valor) => {
-    valor.style.setProperty(
-      "font-weight",
-      "600",
-      "important"
-    );
-  });
+      valor.style.setProperty(
+        "color",
+        "#111111",
+        "important"
+      );
+    });
 
 
   /* =====================================================
@@ -482,12 +577,6 @@ const crearHojaParaPDF = (
     otrosDatos.style.setProperty(
       "min-height",
       "220px",
-      "important"
-    );
-
-    otrosDatos.style.setProperty(
-      "height",
-      "auto",
       "important"
     );
 
@@ -516,17 +605,28 @@ const crearHojaParaPDF = (
     );
 
     grafica.style.setProperty(
-      "height",
-      "auto",
-      "important"
-    );
-
-    grafica.style.setProperty(
       "font-size",
       "9px",
       "important"
     );
   }
+
+
+  /* =====================================================
+     QUITAR BOTONES DEL PDF
+  ===================================================== */
+
+  hoja
+    .querySelectorAll(
+      "button, .no-imprimir"
+    )
+    .forEach((elemento) => {
+      elemento.style.setProperty(
+        "display",
+        "none",
+        "important"
+      );
+    });
 
 
   contenedor.appendChild(hoja);
@@ -554,9 +654,7 @@ export const crearPDF = async () => {
       )
     );
 
-  if (
-    hojasOriginales.length === 0
-  ) {
+  if (hojasOriginales.length === 0) {
     throw new Error(
       "No se encontró la planilla para generar el PDF."
     );
@@ -569,19 +667,6 @@ export const crearPDF = async () => {
     format: "a4",
     compress: true,
   });
-
-
-  const anchoA4 = 210;
-  const altoA4 = 297;
-
-  const margenX = 7;
-  const margenY = 7;
-
-  const anchoDisponible =
-    anchoA4 - margenX * 2;
-
-  const altoDisponible =
-    altoA4 - margenY * 2;
 
 
   for (
@@ -600,47 +685,42 @@ export const crearPDF = async () => {
     try {
       await esperarImagenes(hoja);
 
-
-      /*
-       * Pequeña espera para que el navegador
-       * termine de calcular tamaños e imágenes.
-       */
-      await new Promise(
-        (resolve) =>
-          setTimeout(resolve, 100)
-      );
-
-
-      const altoReal =
-        Math.ceil(
-          hoja.scrollHeight
-        );
+      await esperarRender();
 
 
       const canvas =
         await html2canvas(
           hoja,
           {
+            
             scale: 2,
+
+            backgroundColor:
+              "#ffffff",
 
             useCORS: true,
 
             allowTaint: true,
 
-            backgroundColor:
-              "#ffffff",
-
             logging: false,
 
-            width: 794,
+            width:
+              A4_WIDTH_PX,
 
-            height: altoReal,
+            height:
+              A4_HEIGHT_PX,
 
-            windowWidth: 1200,
+            windowWidth:
+              1200,
+
+            windowHeight:
+              A4_HEIGHT_PX,
 
             scrollX: 0,
 
             scrollY: 0,
+
+            removeContainer: true,
           }
         );
 
@@ -648,7 +728,7 @@ export const crearPDF = async () => {
       const imagen =
         canvas.toDataURL(
           "image/jpeg",
-          0.96
+          0.95
         );
 
 
@@ -660,69 +740,14 @@ export const crearPDF = async () => {
       }
 
 
-      const proporcion =
-        canvas.width /
-        canvas.height;
-
-
-      let anchoFinal =
-        anchoDisponible;
-
-      let altoFinal =
-        anchoFinal /
-        proporcion;
-
-
-      /*
-       * Si la hoja supera el alto disponible,
-       * se reduce proporcionalmente.
-       */
-      if (
-        altoFinal >
-        altoDisponible
-      ) {
-        altoFinal =
-          altoDisponible;
-
-        anchoFinal =
-          altoFinal *
-          proporcion;
-      }
-
-
-      /*
-       * CENTRADO HORIZONTAL
-       */
-      const x =
-        (anchoA4 -
-          anchoFinal) /
-        2;
-
-
-      /*
-       * IMPORTANTE:
-       *
-       * Antes estaba:
-       *
-       * const y =
-       *   (altoA4 - altoFinal) / 2;
-       *
-       * Eso centraba verticalmente
-       * la segunda página y generaba
-       * todo el espacio vacío arriba.
-       *
-       * Ahora comienza desde arriba.
-       */
-      const y = margenY;
-
-
+      
       pdf.addImage(
         imagen,
         "JPEG",
-        x,
-        y,
-        anchoFinal,
-        altoFinal,
+        0,
+        0,
+        210,
+        297,
         undefined,
         "FAST"
       );
@@ -741,19 +766,18 @@ export const crearPDF = async () => {
    DESCARGAR PDF
 ===================================================== */
 
-export const descargarPDF =
-  async (
-    nombrePlanilla = "planilla"
-  ) => {
-    const pdf =
-      await crearPDF();
+export const descargarPDF = async (
+  nombrePlanilla = "planilla"
+) => {
+  const pdf =
+    await crearPDF();
 
-    const nombre =
-      limpiarNombre(
-        nombrePlanilla
-      );
-
-    pdf.save(
-      `${nombre}.pdf`
+  const nombre =
+    limpiarNombre(
+      nombrePlanilla
     );
-  };
+
+  pdf.save(
+    `${nombre}.pdf`
+  );
+};
