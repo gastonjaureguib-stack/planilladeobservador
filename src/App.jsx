@@ -23,6 +23,7 @@ const observacionInicial = {
   fechaObservacion: "",
   fechaEntrega: "",
   firmaProfesor: "",
+  firmaTecnicoUrl: "",
 
   club: "",
   categoria: "",
@@ -73,7 +74,9 @@ function App() {
 
   const [formData, setFormData] = useState(() => {
     try {
-      const borrador = localStorage.getItem(BORRADOR_KEY);
+      const borrador = localStorage.getItem(
+        BORRADOR_KEY
+      );
 
       return borrador
         ? {
@@ -90,33 +93,47 @@ function App() {
     }
   });
 
-  const [observaciones, setObservaciones] = useState([]);
+  const [observaciones, setObservaciones] =
+    useState([]);
 
-  const [observacionEditando, setObservacionEditando] =
-    useState(null);
+  const [
+    observacionEditando,
+    setObservacionEditando,
+  ] = useState(null);
 
-  const [observacionSeleccionada, setObservacionSeleccionada] =
-    useState(null);
+  const [
+    observacionSeleccionada,
+    setObservacionSeleccionada,
+  ] = useState(null);
 
-  const [nombrePlanillaEditando, setNombrePlanillaEditando] =
+  const [
+    nombrePlanillaEditando,
+    setNombrePlanillaEditando,
+  ] = useState("");
+
+  const [busqueda, setBusqueda] =
     useState("");
 
-  const [busqueda, setBusqueda] = useState("");
-
-  const [cargando, setCargando] = useState(true);
+  const [cargando, setCargando] =
+    useState(true);
 
   // =====================================================
   // BORRADOR LOCAL DE SEGURIDAD
   // =====================================================
 
   useEffect(() => {
-    if (vista !== "nueva" && vista !== "editar") {
+    if (
+      vista !== "nueva" &&
+      vista !== "editar"
+    ) {
       return;
     }
 
-    const hayDatos = Object.values(formData).some(
-      (valor) => String(valor || "").trim() !== ""
-    );
+    const hayDatos =
+      Object.values(formData).some(
+        (valor) =>
+          String(valor || "").trim() !== ""
+      );
 
     if (hayDatos) {
       localStorage.setItem(
@@ -124,42 +141,49 @@ function App() {
         JSON.stringify(formData)
       );
     } else {
-      localStorage.removeItem(BORRADOR_KEY);
+      localStorage.removeItem(
+        BORRADOR_KEY
+      );
     }
   }, [formData, vista]);
 
   // =====================================================
-  // CARGAR OBSERVACIONES DESDE SUPABASE
+  // CARGAR OBSERVACIONES
   // =====================================================
 
-  const cargarObservaciones = async () => {
-    try {
-      setCargando(true);
+  const cargarObservaciones =
+    async () => {
+      try {
+        setCargando(true);
 
-      const data = await obtenerObservaciones();
+        const data =
+          await obtenerObservaciones();
 
-      setObservaciones(data || []);
+        setObservaciones(
+          data || []
+        );
 
-      return data || [];
-    } catch (error) {
-      console.error(
-        "Error cargando observaciones:",
-        error
-      );
+        return data || [];
+      } catch (error) {
+        console.error(
+          "Error cargando observaciones:",
+          error
+        );
 
-      await Swal.fire({
-        icon: "error",
-        title: "No se pudieron cargar las planillas",
-        text:
-          error?.message ||
-          "No se pudo conectar con Supabase.",
-      });
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudieron cargar las planillas",
+          text:
+            error?.message ||
+            "No se pudo conectar con Supabase.",
+        });
 
-      return [];
-    } finally {
-      setCargando(false);
-    }
-  };
+        return [];
+      } finally {
+        setCargando(false);
+      }
+    };
 
   useEffect(() => {
     cargarObservaciones();
@@ -169,150 +193,69 @@ function App() {
   // NUEVA OBSERVACIÓN
   // =====================================================
 
-  const nuevaObservacion = async () => {
-    const borradorGuardado =
-      localStorage.getItem(BORRADOR_KEY);
-
-    if (borradorGuardado) {
-      let borrador = null;
-
-      try {
-        borrador = JSON.parse(
-          borradorGuardado
-        );
-      } catch {
-        borrador = null;
-      }
-
-      if (borrador) {
-        const resultado = await Swal.fire({
-          icon: "question",
-          title: "Hay una planilla sin terminar",
-          text:
-            "¿Querés continuarla o empezar una nueva?",
-          showDenyButton: true,
-          showCancelButton: true,
-          confirmButtonText: "Continuar",
-          denyButtonText: "Empezar nueva",
-          cancelButtonText: "Cancelar",
-        });
-
-        if (resultado.isConfirmed) {
-          setFormData({
-            ...observacionInicial,
-            ...borrador,
-          });
-
-          setVista("nueva");
-          setObservacionEditando(null);
-          setObservacionSeleccionada(null);
-
-          return;
-        }
-
-        if (!resultado.isDenied) {
-          return;
-        }
-      }
-    }
-
-    localStorage.removeItem(BORRADOR_KEY);
-
-    setFormData({
-      ...observacionInicial,
-    });
-
-    setObservacionEditando(null);
-    setObservacionSeleccionada(null);
-    setNombrePlanillaEditando("");
-
-    setVista("nueva");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // =====================================================
-  // FINALIZAR Y GUARDAR NUEVA PLANILLA
-  // =====================================================
-
-  const finalizarObservacion = async (datosFinales) => {
-    setFormData(datosFinales);
-
-    localStorage.setItem(
-      BORRADOR_KEY,
-      JSON.stringify(datosFinales)
-    );
-
-    const resultadoNombre = await Swal.fire({
-      title: "Guardar planilla",
-
-      text:
-        "Poné un nombre para encontrarla fácilmente después.",
-
-      input: "text",
-
-      inputValue:
-        datosFinales.club || "",
-
-      inputPlaceholder:
-        "Ej: Independiente - Categoría 2017",
-
-      showCancelButton: true,
-
-      confirmButtonText: "Guardar planilla",
-
-      cancelButtonText: "Volver",
-
-      inputValidator: (value) => {
-        if (!value?.trim()) {
-          return "Escribí un nombre para la planilla.";
-        }
-      },
-    });
-
-    if (!resultadoNombre.isConfirmed) {
-      return;
-    }
-
-    const nombrePlanilla =
-      resultadoNombre.value.trim();
-
-    try {
-      Swal.fire({
-        title: "Guardando planilla...",
-
-        text:
-          "No cierres esta ventana.",
-
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      const guardada =
-        await crearObservacion(
-          nombrePlanilla,
-          datosFinales
+  const nuevaObservacion =
+    async () => {
+      const borradorGuardado =
+        localStorage.getItem(
+          BORRADOR_KEY
         );
 
-      if (!guardada?.id) {
-        throw new Error(
-          "Supabase no confirmó el guardado."
-        );
+      if (borradorGuardado) {
+        let borrador = null;
+
+        try {
+          borrador =
+            JSON.parse(
+              borradorGuardado
+            );
+        } catch {
+          borrador = null;
+        }
+
+        if (borrador) {
+          const resultado =
+            await Swal.fire({
+              icon: "question",
+              title:
+                "Hay una planilla sin terminar",
+              text:
+                "¿Querés continuarla o empezar una nueva?",
+              showDenyButton: true,
+              showCancelButton: true,
+              confirmButtonText:
+                "Continuar",
+              denyButtonText:
+                "Empezar nueva",
+              cancelButtonText:
+                "Cancelar",
+            });
+
+          if (
+            resultado.isConfirmed
+          ) {
+            setFormData({
+              ...observacionInicial,
+              ...borrador,
+            });
+
+            setVista("nueva");
+
+            setObservacionEditando(
+              null
+            );
+
+            setObservacionSeleccionada(
+              null
+            );
+
+            return;
+          }
+
+          if (!resultado.isDenied) {
+            return;
+          }
+        }
       }
-
-      const actualizadas =
-        await obtenerObservaciones();
-
-      setObservaciones(
-        actualizadas || []
-      );
 
       localStorage.removeItem(
         BORRADOR_KEY
@@ -326,130 +269,252 @@ function App() {
       setObservacionSeleccionada(null);
       setNombrePlanillaEditando("");
 
+      setVista("nueva");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
+
+  // =====================================================
+  // GUARDAR NUEVA PLANILLA
+  // =====================================================
+
+  const finalizarObservacion =
+    async (datosFinales) => {
+      setFormData(
+        datosFinales
+      );
+
+      localStorage.setItem(
+        BORRADOR_KEY,
+        JSON.stringify(
+          datosFinales
+        )
+      );
+
+      const resultadoNombre =
+        await Swal.fire({
+          title:
+            "Guardar planilla",
+
+          text:
+            "Poné un nombre para encontrarla fácilmente después.",
+
+          input: "text",
+
+          inputValue:
+            datosFinales.club || "",
+
+          inputPlaceholder:
+            "Ej: Independiente - Categoría 2017",
+
+          showCancelButton: true,
+
+          confirmButtonText:
+            "Guardar planilla",
+
+          cancelButtonText:
+            "Volver",
+
+          inputValidator:
+            (value) => {
+              if (!value?.trim()) {
+                return "Escribí un nombre para la planilla.";
+              }
+            },
+        });
+
+      if (
+        !resultadoNombre.isConfirmed
+      ) {
+        return;
+      }
+
+      const nombrePlanilla =
+        resultadoNombre.value.trim();
+
+      try {
+        Swal.fire({
+          title:
+            "Guardando planilla...",
+
+          text:
+            "No cierres esta ventana.",
+
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const guardada =
+          await crearObservacion(
+            nombrePlanilla,
+            datosFinales
+          );
+
+        if (!guardada?.id) {
+          throw new Error(
+            "Supabase no confirmó el guardado."
+          );
+        }
+
+        const actualizadas =
+          await obtenerObservaciones();
+
+        setObservaciones(
+          actualizadas || []
+        );
+
+        localStorage.removeItem(
+          BORRADOR_KEY
+        );
+
+        setFormData({
+          ...observacionInicial,
+        });
+
+        setObservacionEditando(
+          null
+        );
+
+        setObservacionSeleccionada(
+          null
+        );
+
+        setNombrePlanillaEditando(
+          ""
+        );
+
+        setVista("historial");
+
+        await Swal.fire({
+          icon: "success",
+          title:
+            "Planilla guardada",
+          text: `"${nombrePlanilla}" quedó guardada correctamente.`,
+          confirmButtonText:
+            "Aceptar",
+        });
+      } catch (error) {
+        console.error(
+          "Error guardando:",
+          error
+        );
+
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudo guardar",
+
+          html: `
+            <p>La información no se perdió.</p>
+            <p>Quedó guardada como borrador en este dispositivo.</p>
+            <p style="font-size:12px;margin-top:12px">
+              ${
+                error?.message ||
+                "Error desconocido"
+              }
+            </p>
+          `,
+        });
+      }
+    };
+
+  // =====================================================
+  // DATOS SUPABASE → FORMULARIO
+  // =====================================================
+
+  const obtenerDatosFormulario =
+    (observacion) => ({
+      ...observacionInicial,
+      ...(observacion?.datos || {}),
+    });
+
+  // =====================================================
+  // HISTORIAL
+  // =====================================================
+
+  const abrirHistorial =
+    async () => {
+      await cargarObservaciones();
+
       setVista("historial");
-
-      await Swal.fire({
-        icon: "success",
-        title: "Planilla guardada",
-        text: `"${nombrePlanilla}" quedó guardada correctamente.`,
-        confirmButtonText: "Aceptar",
-      });
-    } catch (error) {
-      console.error(
-        "Error guardando:",
-        error
-      );
-
-      await Swal.fire({
-        icon: "error",
-        title: "No se pudo guardar",
-
-        html: `
-          <p>La información no se perdió.</p>
-          <p>Quedó guardada como borrador en este dispositivo.</p>
-          <p style="font-size:12px;margin-top:12px">
-            ${
-              error?.message ||
-              "Error desconocido"
-            }
-          </p>
-        `,
-      });
-    }
-  };
+    };
 
   // =====================================================
-  // REGISTRO SUPABASE → DATOS DEL FORMULARIO
+  // VER
   // =====================================================
 
-  const obtenerDatosFormulario = (
-    observacion
-  ) => ({
-    ...observacionInicial,
-    ...(observacion?.datos || {}),
-  });
-
-  // =====================================================
-  // ABRIR HISTORIAL
-  // =====================================================
-
-  const abrirHistorial = async () => {
-    await cargarObservaciones();
-
-    setVista("historial");
-  };
-
-  // =====================================================
-  // VER OBSERVACIÓN
-  // =====================================================
-
-  const verObservacion = (
-    observacion
-  ) => {
-    setObservacionSeleccionada(
-      observacion
-    );
-
-    setFormData(
-      obtenerDatosFormulario(
-        observacion
-      )
-    );
-
-    setNombrePlanillaEditando(
-      observacion.nombre_planilla ||
-        ""
-    );
-
-    setObservacionEditando(null);
-
-    setVista("ver");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // =====================================================
-  // EDITAR OBSERVACIÓN
-  // =====================================================
-
-  const editarObservacion = (
-    observacion
-  ) => {
-    const datos =
-      obtenerDatosFormulario(
+  const verObservacion =
+    (observacion) => {
+      setObservacionSeleccionada(
         observacion
       );
 
-    setObservacionSeleccionada(
-      observacion
-    );
+      setFormData(
+        obtenerDatosFormulario(
+          observacion
+        )
+      );
 
-    setFormData(datos);
+      setNombrePlanillaEditando(
+        observacion.nombre_planilla ||
+          ""
+      );
 
-    setObservacionEditando(
-      observacion.id
-    );
+      setObservacionEditando(null);
 
-    setNombrePlanillaEditando(
-      observacion.nombre_planilla ||
-        ""
-    );
+      setVista("ver");
 
-    localStorage.setItem(
-      BORRADOR_KEY,
-      JSON.stringify(datos)
-    );
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
 
-    setVista("editar");
+  // =====================================================
+  // EDITAR
+  // =====================================================
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+  const editarObservacion =
+    (observacion) => {
+      const datos =
+        obtenerDatosFormulario(
+          observacion
+        );
+
+      setObservacionSeleccionada(
+        observacion
+      );
+
+      setFormData(datos);
+
+      setObservacionEditando(
+        observacion.id
+      );
+
+      setNombrePlanillaEditando(
+        observacion.nombre_planilla ||
+          ""
+      );
+
+      localStorage.setItem(
+        BORRADOR_KEY,
+        JSON.stringify(datos)
+      );
+
+      setVista("editar");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
 
   // =====================================================
   // GUARDAR EDICIÓN
@@ -510,7 +575,8 @@ function App() {
 
         await Swal.fire({
           icon: "success",
-          title: "Cambios guardados",
+          title:
+            "Cambios guardados",
           text:
             "La planilla fue actualizada correctamente.",
         });
@@ -626,12 +692,9 @@ function App() {
 
         await Swal.fire({
           icon: "success",
-
           title:
             "Planilla eliminada",
-
           timer: 1200,
-
           showConfirmButton: false,
         });
       } catch (error) {
@@ -665,10 +728,8 @@ function App() {
       } catch (error) {
         await Swal.fire({
           icon: "error",
-
           title:
             "Error al buscar",
-
           text:
             error?.message,
         });
@@ -688,47 +749,46 @@ function App() {
   // DESCARGAR PDF
   // =====================================================
 
-  const generarPDF = async () => {
-    try {
-      Swal.fire({
-        title:
-          "Generando PDF...",
+  const generarPDF =
+    async () => {
+      try {
+        Swal.fire({
+          title:
+            "Generando PDF...",
 
-        text:
-          "Preparando las dos hojas.",
+          text:
+            "Preparando las dos hojas.",
 
-        allowOutsideClick: false,
+          allowOutsideClick: false,
 
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
-      await descargarPDF(
-        nombrePlanillaEditando ||
-          formData.club ||
-          "planilla-observacion"
-      );
+        await descargarPDF(
+          nombrePlanillaEditando ||
+            formData.club ||
+            "planilla-observacion"
+        );
 
-      Swal.close();
-    } catch (error) {
-      console.error(error);
+        Swal.close();
+      } catch (error) {
+        console.error(error);
 
-      await Swal.fire({
-        icon: "error",
-
-        title:
-          "No se pudo generar el PDF",
-
-        text:
-          error?.message ||
-          "Ocurrió un error al crear el archivo.",
-      });
-    }
-  };
+        await Swal.fire({
+          icon: "error",
+          title:
+            "No se pudo generar el PDF",
+          text:
+            error?.message ||
+            "Ocurrió un error al crear el archivo.",
+        });
+      }
+    };
 
   // =====================================================
-  // PDF DESDE EL HISTORIAL
+  // PDF DESDE HISTORIAL
   // =====================================================
 
   const imprimirObservacion =
@@ -751,27 +811,28 @@ function App() {
 
       setVista("ver");
 
-      setTimeout(async () => {
-        try {
-          await descargarPDF(
-            observacion.nombre_planilla ||
-              observacion.club ||
-              "planilla-observacion"
-          );
-        } catch (error) {
-          console.error(error);
+      setTimeout(
+        async () => {
+          try {
+            await descargarPDF(
+              observacion.nombre_planilla ||
+                observacion.club ||
+                "planilla-observacion"
+            );
+          } catch (error) {
+            console.error(error);
 
-          await Swal.fire({
-            icon: "error",
-
-            title:
-              "No se pudo generar el PDF",
-
-            text:
-              error?.message,
-          });
-        }
-      }, 500);
+            await Swal.fire({
+              icon: "error",
+              title:
+                "No se pudo generar el PDF",
+              text:
+                error?.message,
+            });
+          }
+        },
+        500
+      );
     };
 
   // =====================================================
@@ -852,6 +913,7 @@ function App() {
 
             <PlanillaPreview
               formData={formData}
+              setFormData={setFormData}
             />
 
           </>
@@ -905,9 +967,7 @@ function App() {
 
             <PlanillaPreview
               formData={formData}
-              setFormData={
-                setFormData
-              }
+              setFormData={setFormData}
               editable={true}
             />
 
